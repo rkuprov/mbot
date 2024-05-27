@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "github.com/mbot/server";
+
+service MBotServer {
+  rpc CreateCustomer (CreateCustomerRequest) returns (CreateCustomerReply) {}
+}
+
+message CreateCustomerRequest {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string contact = 4;
+  string token = 5;
+
+}
+
+// The response message containing the greetings.
+message CreateCustomerReply {
+  string message = 1;
+  string id = 2;
+  string token = 3;
+}
+
