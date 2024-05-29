@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/rkuprov/mbot/server";
+option go_package = "github.com/rkuprov/mbot/pkg/mbotpb";
 
 service MBotServer {
   rpc CreateCustomer (CreateCustomerRequest) returns (CreateCustomerReply) {}

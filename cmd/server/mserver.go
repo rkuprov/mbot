@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
+	"net"
+
 	"github.com/go-chi/chi/v5"
 	"google.golang.org/grpc"
-	server "mbot/pkg/proto/mserver"
-	"net"
 )
 
 func main() {
@@ -17,8 +17,8 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	service := &mbotserver{}
-	server.RegisterMBotServerServer(s, service)
+
+	grpc.ServiceRegistrar(service, s)
 	err = s.Serve(lis)
 	if err != nil {
 		panic(err)
