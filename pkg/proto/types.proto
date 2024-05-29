@@ -4,21 +4,35 @@ option go_package = "github.com/rkuprov/mbot/pkg/gen/mbotpb";
 
 service MBotServer {
   rpc CreateCustomer (CreateCustomerRequest) returns (CreateCustomerReply) {}
+  rpc GetCustomer (GetCustomerRequest) returns (GetCustomerReply) {}
+  rpc GetCustomersAll (GetCustomersRequest) returns (GetCustomersReply) {}
+  rpc UpdateCustomer (UpdateCustomerRequest) returns (UpdateCustomerReply) {}
+  rpc DeleteCustomer (DeleteCustomerRequest) returns (DeleteCustomerReply) {}
+
+  rpc AddSubscription (AddSubscriptionRequest) returns (AddSubscriptionReply) {}
+  rpc GetSubscription (GetSubscriptionRequest) returns (GetSubscriptionReply) {}
+  rpc UpdateSubscription (UpdateSubscriptionRequest) returns (UpdateSubscriptionReply) {}
+  rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionReply) {}
+  rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsReply) {}
+  rpc GetSubscriptionByCustomer (GetSubscriptionByCustomerRequest) returns (GetSubscriptionByCustomerReply) {}
+
+  rpc GetStatsByCustomer (GetStatsByCustomerRequest) returns (GetStatsByCustomerReply) {}
+  rpc GetStatsBySubscription (GetStatsBySubscriptionRequest) returns (GetStatsBySubscriptionReply) {}
+  rpc GetStatsAll (GetStatsAllRequest) returns (GetStatsAllReply) {}
+
 }
 
 message CreateCustomerRequest {
-  string id = 1;
   string name = 2;
   string email = 3;
   string contact = 4;
-  string token = 5;
 
 }
 
 // The response message containing the greetings.
 message CreateCustomerReply {
-  string message = 1;
-  string id = 2;
-  string token = 3;
+  string slug = 1;
+  string token = 2;
+  string message = 3;
 }
 

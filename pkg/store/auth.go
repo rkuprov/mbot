@@ -7,8 +7,6 @@ import (
 
 	"github.com/google/uuid"
 	"go.etcd.io/bbolt"
-
-	"github.com/rkuprov/mbot/pkg/datamodel"
 )
 
 var (
@@ -52,17 +50,4 @@ func (c *Client) CreateToken(ctx context.Context, validUntil time.Time) string {
 	}
 
 	return token
-}
-
-func (c *Client) CreateCustomer(ctx context.Context, customer datamodel.Customer) string {
-	id := uuid.New().String()
-	err := c.db.Update(func(tx *bbolt.Tx) error {
-		b := tx.Bucket([]byte("customers"))
-		return b.Put([]byte(id), customer.Encode())
-	})
-	if err != nil {
-		return ""
-	}
-
-	return id
 }
