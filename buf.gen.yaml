@@ -1,6 +1,6 @@
 version: v2
 managed:
-  enabled: true
+  enabled: false
 plugins:
   - remote: buf.build/protocolbuffers/go
     out: pkg/gen/mbotpb

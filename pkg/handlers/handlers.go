@@ -3,9 +3,11 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	"mbot/pkg/store"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
+
+	"github.com/rkuprov/mbot/pkg/store"
 )
 
 func Status(ctx context.Context) http.HandlerFunc {

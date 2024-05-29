@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+
 	"github.com/go-chi/chi/v5"
-	"mbot/pkg/handlers"
-	"mbot/pkg/store"
+
+	"github.com/rkuprov/mbot/pkg/handlers"
+	"github.com/rkuprov/mbot/pkg/store"
 )
 
 func SetupRoutes(r *chi.Mux) {

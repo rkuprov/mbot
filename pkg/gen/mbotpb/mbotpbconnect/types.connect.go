@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	mbotpb "github.com/rkuprov/mbot/pkg/mbotpb"
+	mbotpb "github.com/rkuprov/mbot/pkg/gen/mbotpb"
 	http "net/http"
 	strings "strings"
 )

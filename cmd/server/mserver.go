@@ -2,37 +2,41 @@ package main
 
 import (
 	"context"
-	"net"
+	"fmt"
+	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"google.golang.org/grpc"
+	"connectrpc.com/connect"
+
+	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
+	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 )
 
 func main() {
-	r := chi.NewRouter()
-	SetupRoutes(r)
-	lis, err := net.Listen("tcp", ":8080")
-	if err != nil {
-		panic(err)
-	}
+	// r := chi.NewRouter()
+	// SetupRoutes(r)
+	r := http.NewServeMux()
 
-	s := grpc.NewServer()
+	path, handler := mbotpbconnect.NewMBotServerHandler(&mbotserver{})
+	r.Handle(path, handler)
+	fmt.Println(path)
 
-	grpc.ServiceRegistrar(service, s)
-	err = s.Serve(lis)
+	err := http.ListenAndServe("localhost:8080", r)
 	if err != nil {
 		panic(err)
 	}
 }
 
 type mbotserver struct {
-	server.UnimplementedMBotServerServer
+	mbotpbconnect.UnimplementedMBotServerHandler
 }
 
-func (m mbotserver) CreateCustomer(c context.Context, req *server.CreateCustomerRequest) (*server.CreateCustomerReply, error) {
-	return &server.CreateCustomerReply{
-		Message: "success",
-		Id:      req.Id,
-		Token:   req.Token,
+func (m mbotserver) CreateCustomer(c context.Context,
+	req *connect.Request[mbotpb.CreateCustomerRequest]) (*connect.Response[mbotpb.CreateCustomerReply], error) {
+	return &connect.Response[mbotpb.CreateCustomerReply]{
+		Msg: &mbotpb.CreateCustomerReply{
+			Message: "success",
+			Id:      req.Msg.GetId(),
+			Token:   req.Msg.GetToken(),
+		},
 	}, nil
 }

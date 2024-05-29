@@ -3,10 +3,12 @@ package store
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/google/uuid"
 	"go.etcd.io/bbolt"
-	"mbot/pkg/datamodel"
-	"time"
+
+	"github.com/rkuprov/mbot/pkg/datamodel"
 )
 
 var (
