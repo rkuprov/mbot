@@ -4,21 +4,21 @@ option go_package = "github.com/rkuprov/mbot/pkg/gen/mbotpb";
 
 service MBotServer {
   rpc CreateCustomer (CreateCustomerRequest) returns (CreateCustomerReply) {}
-  rpc GetCustomer (GetCustomerRequest) returns (GetCustomerReply) {}
-  rpc GetCustomersAll (GetCustomersRequest) returns (GetCustomersReply) {}
-  rpc UpdateCustomer (UpdateCustomerRequest) returns (UpdateCustomerReply) {}
-  rpc DeleteCustomer (DeleteCustomerRequest) returns (DeleteCustomerReply) {}
+//  rpc GetCustomer (GetCustomerRequest) returns (GetCustomerReply) {}
+//  rpc GetCustomersAll (GetCustomersRequest) returns (GetCustomersReply) {}
+//  rpc UpdateCustomer (UpdateCustomerRequest) returns (UpdateCustomerReply) {}
+//  rpc DeleteCustomer (DeleteCustomerRequest) returns (DeleteCustomerReply) {}
 
-  rpc AddSubscription (AddSubscriptionRequest) returns (AddSubscriptionReply) {}
-  rpc GetSubscription (GetSubscriptionRequest) returns (GetSubscriptionReply) {}
-  rpc UpdateSubscription (UpdateSubscriptionRequest) returns (UpdateSubscriptionReply) {}
-  rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionReply) {}
-  rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsReply) {}
-  rpc GetSubscriptionByCustomer (GetSubscriptionByCustomerRequest) returns (GetSubscriptionByCustomerReply) {}
+//  rpc AddSubscription (AddSubscriptionRequest) returns (AddSubscriptionReply) {}
+//  rpc GetSubscription (GetSubscriptionRequest) returns (GetSubscriptionReply) {}
+//  rpc UpdateSubscription (UpdateSubscriptionRequest) returns (UpdateSubscriptionReply) {}
+//  rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionReply) {}
+//  rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsReply) {}
+//  rpc GetSubscriptionByCustomer (GetSubscriptionByCustomerRequest) returns (GetSubscriptionByCustomerReply) {}
 
-  rpc GetStatsByCustomer (GetStatsByCustomerRequest) returns (GetStatsByCustomerReply) {}
-  rpc GetStatsBySubscription (GetStatsBySubscriptionRequest) returns (GetStatsBySubscriptionReply) {}
-  rpc GetStatsAll (GetStatsAllRequest) returns (GetStatsAllReply) {}
+//  rpc GetStatsByCustomer (GetStatsByCustomerRequest) returns (GetStatsByCustomerReply) {}
+//  rpc GetStatsBySubscription (GetStatsBySubscriptionRequest) returns (GetStatsBySubscriptionReply) {}
+//  rpc GetStatsAll (GetStatsAllRequest) returns (GetStatsAllReply) {}
 
 }
 
@@ -32,7 +32,7 @@ message CreateCustomerRequest {
 // The response message containing the greetings.
 message CreateCustomerReply {
   string slug = 1;
-  string token = 2;
+  string subscription_id = 2;
   string message = 3;
 }
 

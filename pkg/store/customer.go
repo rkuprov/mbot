@@ -34,7 +34,7 @@ func (c *Client) CreateCustomer(_ context.Context, customer datamodel.Customer) 
 		return "", err
 	}
 
-	return id, nil
+	return customer.Slug, nil
 }
 
 func encodeCustomer(c datamodel.Customer) []byte {

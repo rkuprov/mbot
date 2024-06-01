@@ -21,7 +21,7 @@ type mServer struct {
 func (m mServer) CreateCustomer(ctx context.Context,
 	req *connect.Request[mbotpb.CreateCustomerRequest]) (*connect.Response[mbotpb.CreateCustomerReply], error) {
 
-	id, err := m.db.CreateCustomer(ctx,
+	slug, err := m.db.CreateCustomer(ctx,
 		datamodel.Customer{
 			ID:      uuid.New().String(),
 			Name:    req.Msg.GetName(),
@@ -32,11 +32,15 @@ func (m mServer) CreateCustomer(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
+	cust, err := m.db.GetCustomer(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
 	return &connect.Response[mbotpb.CreateCustomerReply]{
 		Msg: &mbotpb.CreateCustomerReply{
-			Message: fmt.Sprintf("Customer created with ID: %s", id),
-			Id:      req.Msg.GetId(),
-			Token:   req.Msg.GetToken(),
+			Message:        fmt.Sprintf("Customer created with ID: %s", slug),
+			Slug:           cust.Slug,
+			SubscriptionId: cust.SubscriptionID,
 		},
 	}, nil
 }
