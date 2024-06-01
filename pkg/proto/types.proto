@@ -4,21 +4,21 @@ option go_package = "github.com/rkuprov/mbot/pkg/gen/mbotpb";
 
 service MBotServer {
   rpc CreateCustomer (CreateCustomerRequest) returns (CreateCustomerReply) {}
-//  rpc GetCustomer (GetCustomerRequest) returns (GetCustomerReply) {}
-//  rpc GetCustomersAll (GetCustomersRequest) returns (GetCustomersReply) {}
-//  rpc UpdateCustomer (UpdateCustomerRequest) returns (UpdateCustomerReply) {}
-//  rpc DeleteCustomer (DeleteCustomerRequest) returns (DeleteCustomerReply) {}
+  rpc GetCustomer (GetCustomerRequest) returns (GetCustomerReply) {}
+  rpc GetCustomersAll (GetCustomersAllRequest) returns (GetCustomersAllReply) {}
+  rpc UpdateCustomer (UpdateCustomerRequest) returns (UpdateCustomerReply) {}
+  rpc DeleteCustomer (DeleteCustomerRequest) returns (DeleteCustomerReply) {}
 
-//  rpc AddSubscription (AddSubscriptionRequest) returns (AddSubscriptionReply) {}
-//  rpc GetSubscription (GetSubscriptionRequest) returns (GetSubscriptionReply) {}
-//  rpc UpdateSubscription (UpdateSubscriptionRequest) returns (UpdateSubscriptionReply) {}
-//  rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionReply) {}
-//  rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsReply) {}
-//  rpc GetSubscriptionByCustomer (GetSubscriptionByCustomerRequest) returns (GetSubscriptionByCustomerReply) {}
+  rpc AddSubscription (AddSubscriptionRequest) returns (AddSubscriptionReply) {}
+  rpc GetSubscription (GetSubscriptionRequest) returns (GetSubscriptionReply) {}
+  rpc UpdateSubscription (UpdateSubscriptionRequest) returns (UpdateSubscriptionReply) {}
+  rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionReply) {}
+  rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsReply) {}
+  rpc GetSubscriptionByCustomer (GetSubscriptionByCustomerRequest) returns (GetSubscriptionByCustomerReply) {}
 
-//  rpc GetStatsByCustomer (GetStatsByCustomerRequest) returns (GetStatsByCustomerReply) {}
-//  rpc GetStatsBySubscription (GetStatsBySubscriptionRequest) returns (GetStatsBySubscriptionReply) {}
-//  rpc GetStatsAll (GetStatsAllRequest) returns (GetStatsAllReply) {}
+  rpc GetStatsByCustomer (GetStatsByCustomerRequest) returns (GetStatsByCustomerReply) {}
+  rpc GetStatsBySubscription (GetStatsBySubscriptionRequest) returns (GetStatsBySubscriptionReply) {}
+  rpc GetStatsAll (GetStatsAllRequest) returns (GetStatsAllReply) {}
 
 }
 
@@ -36,3 +36,114 @@ message CreateCustomerReply {
   string message = 3;
 }
 
+message GetCustomerRequest {
+  string slug = 1;
+}
+
+message GetCustomerReply {
+  string name = 1;
+  string email = 2;
+  string contact = 3;
+  string subscription_id = 4;
+}
+
+message GetCustomersAllRequest {
+}
+
+message GetCustomersAllReply {
+  repeated GetCustomerReply customers = 1;
+}
+
+message UpdateCustomerRequest {
+  string slug = 1;
+  string name = 2;
+  string email = 3;
+  string contact = 4;
+}
+
+message UpdateCustomerReply {
+  string message = 1;
+}
+
+message DeleteCustomerRequest {
+  string slug = 1;
+}
+
+message DeleteCustomerReply {
+  string message = 1;
+}
+
+message AddSubscriptionRequest {
+  string slug = 1;
+  string subscription_id = 2;
+}
+
+message AddSubscriptionReply {
+  string message = 1;
+  string subscription_id = 2;
+  string subscription_expiry = 3;
+}
+
+message GetSubscriptionRequest {
+  string subscription_id = 1;
+}
+
+message GetSubscriptionReply {
+  GetCustomerReply customer = 1;
+  string subscription_expiry = 2;
+}
+
+message UpdateSubscriptionRequest {
+  string subscription_id = 1;
+  string subscription_expiry = 2;
+}
+
+message UpdateSubscriptionReply {
+  string message = 1;
+}
+
+message DeleteSubscriptionRequest {
+  string subscription_id = 1;
+}
+
+message DeleteSubscriptionReply {
+  string message = 1;
+}
+
+message GetSubscriptionsRequest {
+}
+
+message GetSubscriptionsReply {
+  repeated GetSubscriptionReply subscriptions = 1;
+}
+
+message GetSubscriptionByCustomerRequest {
+  string slug = 1;
+}
+
+message GetSubscriptionByCustomerReply {
+  GetSubscriptionReply subscription = 1;
+}
+
+message GetStatsByCustomerRequest {
+  string slug = 1;
+}
+
+message GetStatsByCustomerReply {
+  string message = 1;
+}
+
+message GetStatsBySubscriptionRequest {
+  string subscription_id = 1;
+}
+
+message GetStatsBySubscriptionReply {
+  string message = 1;
+}
+
+message GetStatsAllRequest {
+}
+
+message GetStatsAllReply {
+  string message = 1;
+}
