@@ -16,15 +16,20 @@ var (
 	customerSlugBucket = []byte("customer-slug")
 )
 
-func (c *Client) CreateCustomer(_ context.Context, customer datamodel.Customer) (string, error) {
+func (c *Client) CreateCustomer(_ context.Context, name, email, contact string) (string, error) {
 	id := uuid.New().String()
-	customer.Slug = generateSlug(customer.Name, id)
+	slug := generateSlug(name, id)
 	err := c.db.Update(func(tx *bbolt.Tx) error {
-		err := tx.Bucket(customerBucket).Put([]byte(id), encodeCustomer(customer))
+		err := tx.Bucket(customerBucket).Put([]byte(id), encodeCustomer(datamodel.Customer{
+			Slug:    slug,
+			Name:    name,
+			Email:   email,
+			Contact: contact,
+		}))
 		if err != nil {
 			return err
 		}
-		err = tx.Bucket(customerSlugBucket).Put([]byte(customer.Slug), []byte(id))
+		err = tx.Bucket(customerSlugBucket).Put([]byte(slug), []byte(id))
 		if err != nil {
 			return err
 		}
@@ -34,11 +39,11 @@ func (c *Client) CreateCustomer(_ context.Context, customer datamodel.Customer) 
 		return "", err
 	}
 
-	return customer.Slug, nil
+	return slug, nil
 }
 
 func encodeCustomer(c datamodel.Customer) []byte {
-	in := fmt.Sprintf("%s#%s#%s#%s#%s", c.Slug, c.Name, c.Email, c.Contact, c.SubscriptionID)
+	in := fmt.Sprintf("%s#%s#%s#%s#%s", c.Slug, c.Name, c.Email, c.Contact, c.SubscriptionId)
 
 	return []byte(in)
 }
@@ -54,7 +59,7 @@ func decodeCustomer(in string) (datamodel.Customer, error) {
 		Name:           parts[1],
 		Email:          parts[2],
 		Contact:        parts[3],
-		SubscriptionID: parts[4],
+		SubscriptionId: parts[4],
 	}, nil
 }
 

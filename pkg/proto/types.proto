@@ -36,22 +36,27 @@ message CreateCustomerReply {
   string message = 3;
 }
 
+message Customer {
+  string slug = 1;
+  string name = 2;
+  string email = 3;
+  string contact = 4;
+  string subscription_id = 5;
+}
+
 message GetCustomerRequest {
   string slug = 1;
 }
 
 message GetCustomerReply {
-  string name = 1;
-  string email = 2;
-  string contact = 3;
-  string subscription_id = 4;
+  Customer customer = 1;
 }
 
 message GetCustomersAllRequest {
 }
 
 message GetCustomersAllReply {
-  repeated GetCustomerReply customers = 1;
+  repeated Customer customers = 1;
 }
 
 message UpdateCustomerRequest {
@@ -73,6 +78,11 @@ message DeleteCustomerReply {
   string message = 1;
 }
 
+message Subscription {
+  string subscription_id = 1;
+  string subscription_expiry = 2;
+}
+
 message AddSubscriptionRequest {
   string slug = 1;
   string subscription_id = 2;
@@ -80,8 +90,7 @@ message AddSubscriptionRequest {
 
 message AddSubscriptionReply {
   string message = 1;
-  string subscription_id = 2;
-  string subscription_expiry = 3;
+  Subscription subscription = 2;
 }
 
 message GetSubscriptionRequest {
@@ -90,7 +99,7 @@ message GetSubscriptionRequest {
 
 message GetSubscriptionReply {
   GetCustomerReply customer = 1;
-  string subscription_expiry = 2;
+  Subscription subscription = 2;
 }
 
 message UpdateSubscriptionRequest {
