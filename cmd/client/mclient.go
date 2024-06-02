@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	c := mbotpbconnect.NewMBotServerClient(http.DefaultClient, "http://localhost:8080")
+	c := mbotpbconnect.NewMBotServerServiceClient(http.DefaultClient, "http://localhost:8080")
 	resp, err := c.CreateCustomer(context.Background(), &connect.Request[mbotpb.CreateCustomerRequest]{
 		Msg: &mbotpb.CreateCustomerRequest{
 			Name:    "John Doe",

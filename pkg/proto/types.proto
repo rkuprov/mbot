@@ -1,24 +1,26 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/rkuprov/mbot/pkg/gen/mbotpb";
 
-service MBotServer {
-  rpc CreateCustomer (CreateCustomerRequest) returns (CreateCustomerReply) {}
-  rpc GetCustomer (GetCustomerRequest) returns (GetCustomerReply) {}
-  rpc GetCustomersAll (GetCustomersAllRequest) returns (GetCustomersAllReply) {}
-  rpc UpdateCustomer (UpdateCustomerRequest) returns (UpdateCustomerReply) {}
-  rpc DeleteCustomer (DeleteCustomerRequest) returns (DeleteCustomerReply) {}
+service MBotServerService {
+  rpc CreateCustomer (CreateCustomerRequest) returns (CreateCustomerResponse) {}
+  rpc GetCustomer (GetCustomerRequest) returns (GetCustomerResponse) {}
+  rpc GetCustomersAll (GetCustomersAllRequest) returns (GetCustomersAllResponse) {}
+  rpc UpdateCustomer (UpdateCustomerRequest) returns (UpdateCustomerResponse) {}
+  rpc DeleteCustomer (DeleteCustomerRequest) returns (DeleteCustomerResponse) {}
 
-  rpc AddSubscription (AddSubscriptionRequest) returns (AddSubscriptionReply) {}
-  rpc GetSubscription (GetSubscriptionRequest) returns (GetSubscriptionReply) {}
-  rpc UpdateSubscription (UpdateSubscriptionRequest) returns (UpdateSubscriptionReply) {}
-  rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionReply) {}
-  rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsReply) {}
-  rpc GetSubscriptionByCustomer (GetSubscriptionByCustomerRequest) returns (GetSubscriptionByCustomerReply) {}
+  rpc CreateSubscription (CreateSubscriptionRequest) returns (CreateSubscriptionResponse) {}
+  rpc GetSubscription (GetSubscriptionRequest) returns (GetSubscriptionResponse) {}
+  rpc GetSubscriptionsAll (GetSubscriptionsAllRequest) returns (GetSubscriptionsAllResponse) {}
+  rpc UpdateSubscription (UpdateSubscriptionRequest) returns (UpdateSubscriptionResponse) {}
+  rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse) {}
+  rpc GetSubscriptionByCustomer (GetSubscriptionByCustomerRequest) returns (GetSubscriptionByCustomerResponse) {}
 
-  rpc GetStatsByCustomer (GetStatsByCustomerRequest) returns (GetStatsByCustomerReply) {}
-  rpc GetStatsBySubscription (GetStatsBySubscriptionRequest) returns (GetStatsBySubscriptionReply) {}
-  rpc GetStatsAll (GetStatsAllRequest) returns (GetStatsAllReply) {}
+  rpc GetStatsByCustomer (GetStatsByCustomerRequest) returns (GetStatsByCustomerResponse) {}
+  rpc GetStatsBySubscription (GetStatsBySubscriptionRequest) returns (GetStatsBySubscriptionResponse) {}
+  rpc GetStatsAll (GetStatsAllRequest) returns (GetStatsAllResponse) {}
 
 }
 
@@ -30,7 +32,7 @@ message CreateCustomerRequest {
 }
 
 // The response message containing the greetings.
-message CreateCustomerReply {
+message CreateCustomerResponse {
   string slug = 1;
   string subscription_id = 2;
   string message = 3;
@@ -41,21 +43,21 @@ message Customer {
   string name = 2;
   string email = 3;
   string contact = 4;
-  string subscription_id = 5;
+  repeated string subscription_id = 5;
 }
 
 message GetCustomerRequest {
   string slug = 1;
 }
 
-message GetCustomerReply {
+message GetCustomerResponse {
   Customer customer = 1;
 }
 
 message GetCustomersAllRequest {
 }
 
-message GetCustomersAllReply {
+message GetCustomersAllResponse {
   repeated Customer customers = 1;
 }
 
@@ -66,7 +68,7 @@ message UpdateCustomerRequest {
   string contact = 4;
 }
 
-message UpdateCustomerReply {
+message UpdateCustomerResponse {
   string message = 1;
 }
 
@@ -74,31 +76,32 @@ message DeleteCustomerRequest {
   string slug = 1;
 }
 
-message DeleteCustomerReply {
+message DeleteCustomerResponse {
   string message = 1;
 }
 
 message Subscription {
   string subscription_id = 1;
-  string subscription_expiry = 2;
+  google.protobuf.Timestamp subscription_expiry = 2;
 }
 
-message AddSubscriptionRequest {
+message CreateSubscriptionRequest {
   string slug = 1;
-  string subscription_id = 2;
+  google.protobuf.Timestamp subscription_expiry = 2;
 }
 
-message AddSubscriptionReply {
+message CreateSubscriptionResponse {
   string message = 1;
-  Subscription subscription = 2;
+  string slug = 2;
+  Subscription subscription = 3;
 }
 
 message GetSubscriptionRequest {
   string subscription_id = 1;
 }
 
-message GetSubscriptionReply {
-  GetCustomerReply customer = 1;
+message GetSubscriptionResponse {
+  GetCustomerResponse customer = 1;
   Subscription subscription = 2;
 }
 
@@ -107,7 +110,7 @@ message UpdateSubscriptionRequest {
   string subscription_expiry = 2;
 }
 
-message UpdateSubscriptionReply {
+message UpdateSubscriptionResponse {
   string message = 1;
 }
 
@@ -115,30 +118,30 @@ message DeleteSubscriptionRequest {
   string subscription_id = 1;
 }
 
-message DeleteSubscriptionReply {
+message DeleteSubscriptionResponse {
   string message = 1;
 }
 
-message GetSubscriptionsRequest {
+message GetSubscriptionsAllRequest {
 }
 
-message GetSubscriptionsReply {
-  repeated GetSubscriptionReply subscriptions = 1;
+message GetSubscriptionsAllResponse {
+  repeated GetSubscriptionResponse subscriptions = 1;
 }
 
 message GetSubscriptionByCustomerRequest {
   string slug = 1;
 }
 
-message GetSubscriptionByCustomerReply {
-  GetSubscriptionReply subscription = 1;
+message GetSubscriptionByCustomerResponse {
+  GetSubscriptionResponse subscription = 1;
 }
 
 message GetStatsByCustomerRequest {
   string slug = 1;
 }
 
-message GetStatsByCustomerReply {
+message GetStatsByCustomerResponse {
   string message = 1;
 }
 
@@ -146,13 +149,13 @@ message GetStatsBySubscriptionRequest {
   string subscription_id = 1;
 }
 
-message GetStatsBySubscriptionReply {
+message GetStatsBySubscriptionResponse {
   string message = 1;
 }
 
 message GetStatsAllRequest {
 }
 
-message GetStatsAllReply {
+message GetStatsAllResponse {
   string message = 1;
 }

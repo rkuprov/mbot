@@ -105,8 +105,8 @@ func (c *Client) GetCustomer(_ context.Context, slug string) (datamodel.Customer
 	return decodeCustomer(encoded)
 }
 
-func (c *Client) GetCustomersAll(_ context.Context) ([]datamodel.Customer, error) {
-	var customers []datamodel.Customer
+func (c *Client) GetCustomersAll(_ context.Context) ([]*datamodel.Customer, error) {
+	var customers []*datamodel.Customer
 	err := c.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(customerBucket)
 		return b.ForEach(func(k, v []byte) error {
@@ -114,7 +114,7 @@ func (c *Client) GetCustomersAll(_ context.Context) ([]datamodel.Customer, error
 			if err != nil {
 				return err
 			}
-			customers = append(customers, customer)
+			customers = append(customers, &customer)
 			return nil
 		})
 	})
