@@ -1,0 +1,56 @@
+syntax = "proto3";
+package mbot;
+
+message CreateCustomerRequest {
+  string name = 2;
+  string email = 3;
+  string contact = 4;
+}
+
+// The response message containing the greetings.
+message CreateCustomerResponse {
+  string slug = 1;
+  repeated string subscription_ids = 2;
+  string message = 3;
+}
+
+message Customer {
+  string slug = 1;
+  string name = 2;
+  string email = 3;
+  string contact = 4;
+  repeated string subscription_ids = 5;
+}
+
+message GetCustomerRequest {
+  string slug = 1;
+}
+
+message GetCustomerResponse {
+  Customer customer = 1;
+}
+
+message GetCustomersAllRequest {}
+
+message GetCustomersAllResponse {
+  repeated Customer customers = 1;
+}
+
+message UpdateCustomerRequest {
+  string slug = 1;
+  string name = 2;
+  string email = 3;
+  string contact = 4;
+}
+
+message UpdateCustomerResponse {
+  string message = 1;
+}
+
+message DeleteCustomerRequest {
+  string slug = 1;
+}
+
+message DeleteCustomerResponse {
+  string message = 1;
+}

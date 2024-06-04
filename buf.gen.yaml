@@ -1,6 +1,9 @@
 version: v2
 managed:
   enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: "github.com/rkuprov/mbot/pkg/gen/mbotpb"
 
 plugins:
   - remote: buf.build/protocolbuffers/go

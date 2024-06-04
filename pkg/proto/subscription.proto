@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package mbot;
+
+import "google/protobuf/timestamp.proto";
+import "customer.proto";
+
+message Subscription {
+  string subscription_id = 1;
+  google.protobuf.Timestamp subscription_expiry = 2;
+}
+
+message CreateSubscriptionRequest {
+  string slug = 1;
+  google.protobuf.Timestamp subscription_start_date = 2;
+  int32 duration = 3;
+}
+
+message CreateSubscriptionResponse {
+  string message = 1;
+  string slug = 2;
+  Subscription subscription = 3;
+}
+
+message GetSubscriptionRequest {
+  string subscription_id = 1;
+}
+
+message GetSubscriptionResponse {
+  GetCustomerResponse customer = 1;
+  Subscription subscription = 2;
+}
+
+message UpdateSubscriptionRequest {
+  string subscription_id = 1;
+  string subscription_expiry = 2;
+}
+
+message UpdateSubscriptionResponse {
+  string message = 1;
+}
+
+message DeleteSubscriptionRequest {
+  string subscription_id = 1;
+}
+
+message DeleteSubscriptionResponse {
+  string message = 1;
+}
+
+message GetSubscriptionsAllRequest {}
+
+message GetSubscriptionsAllResponse {
+  repeated GetSubscriptionResponse subscriptions = 1;
+}
+
+message GetSubscriptionByCustomerRequest {
+  string slug = 1;
+}
+
+message GetSubscriptionByCustomerResponse {
+  GetSubscriptionResponse subscription = 1;
+}

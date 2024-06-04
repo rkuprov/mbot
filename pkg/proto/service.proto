@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package mbot;
+
+import "customer.proto";
+import "stats.proto";
+import "subscription.proto";
+
+service MBotServerService {
+  rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse) {}
+  rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse) {}
+  rpc GetCustomersAll(GetCustomersAllRequest) returns (GetCustomersAllResponse) {}
+  rpc UpdateCustomer(UpdateCustomerRequest) returns (UpdateCustomerResponse) {}
+  rpc DeleteCustomer(DeleteCustomerRequest) returns (DeleteCustomerResponse) {}
+
+  rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse) {}
+  rpc GetSubscription(GetSubscriptionRequest) returns (GetSubscriptionResponse) {}
+//  rpc GetSubscriptionsAll(GetSubscriptionsAllRequest) returns (GetSubscriptionsAllResponse) {}
+//  rpc UpdateSubscription(UpdateSubscriptionRequest) returns (UpdateSubscriptionResponse) {}
+//  rpc DeleteSubscription(DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse) {}
+//  rpc GetSubscriptionByCustomer(GetSubscriptionByCustomerRequest) returns (GetSubscriptionByCustomerResponse) {}
+//
+//  rpc GetStatsByCustomer(GetStatsByCustomerRequest) returns (GetStatsByCustomerResponse) {}
+//  rpc GetStatsBySubscription(GetStatsBySubscriptionRequest) returns (GetStatsBySubscriptionResponse) {}
+//  rpc GetStatsAll(GetStatsAllRequest) returns (GetStatsAllResponse) {}
+}

@@ -1,0 +1,24 @@
+syntax = "proto3";
+package mbot;
+
+message GetStatsByCustomerRequest {
+  string slug = 1;
+}
+
+message GetStatsByCustomerResponse {
+  string message = 1;
+}
+
+message GetStatsBySubscriptionRequest {
+  string subscription_id = 1;
+}
+
+message GetStatsBySubscriptionResponse {
+  string message = 1;
+}
+
+message GetStatsAllRequest {}
+
+message GetStatsAllResponse {
+  string message = 1;
+}

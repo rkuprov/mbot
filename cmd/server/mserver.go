@@ -26,15 +26,15 @@ func (m *mServer) CreateCustomer(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	cust, err := m.db.GetCustomer(ctx, slug)
+	c, err := m.db.GetCustomer(ctx, slug)
 	if err != nil {
 		return nil, err
 	}
 	return &connect.Response[mbotpb.CreateCustomerResponse]{
 		Msg: &mbotpb.CreateCustomerResponse{
-			Message:        fmt.Sprintf("Customer created with ID: %s", slug),
-			Slug:           cust.Slug,
-			SubscriptionId: cust.SubscriptionId,
+			Message:         fmt.Sprintf("Customer created with ID: %s", slug),
+			Slug:            c.GetSlug(),
+			SubscriptionIds: c.GetSubscriptionIds(),
 		},
 	}, nil
 }
@@ -48,11 +48,11 @@ func (m *mServer) GetCustomersAll(ctx context.Context,
 	out := make([]*mbotpb.Customer, 0)
 	for _, c := range customers {
 		out = append(out, &mbotpb.Customer{
-			Slug:           c.Slug,
-			Name:           c.Name,
-			Email:          c.Email,
-			Contact:        c.Contact,
-			SubscriptionId: c.SubscriptionId,
+			Slug:            c.GetSlug(),
+			Name:            c.GetName(),
+			Email:           c.GetEmail(),
+			Contact:         c.GetContact(),
+			SubscriptionIds: c.GetSubscriptionIds(),
 		})
 
 	}
@@ -72,11 +72,11 @@ func (m *mServer) GetCustomer(ctx context.Context,
 	return &connect.Response[mbotpb.GetCustomerResponse]{
 		Msg: &mbotpb.GetCustomerResponse{
 			Customer: &mbotpb.Customer{
-				Slug:           cust.Slug,
-				Name:           cust.Name,
-				Email:          cust.Email,
-				Contact:        cust.Contact,
-				SubscriptionId: cust.SubscriptionId,
+				Slug:            cust.Slug,
+				Name:            cust.Name,
+				Email:           cust.Email,
+				Contact:         cust.Contact,
+				SubscriptionIds: cust.SubscriptionIds,
 			},
 		},
 	}, nil
@@ -116,9 +116,11 @@ func (m *mServer) DeleteCustomer(ctx context.Context,
 
 func (m *mServer) CreateSubscription(ctx context.Context,
 	req *connect.Request[mbotpb.CreateSubscriptionRequest]) (*connect.Response[mbotpb.CreateSubscriptionResponse], error) {
+	start := req.Msg.GetSubscriptionStartDate().AsTime().Format("2006-01-02")
 	id, err := m.db.CreateSubscription(ctx,
 		req.Msg.GetSlug(),
-		req.Msg.GetSubscriptionExpiry(),
+		start,
+		int(req.Msg.GetDuration()),
 	)
 	if err != nil {
 		return nil, err
@@ -129,126 +131,128 @@ func (m *mServer) CreateSubscription(ctx context.Context,
 	}
 	return &connect.Response[mbotpb.CreateSubscriptionResponse]{
 		Msg: &mbotpb.CreateSubscriptionResponse{
-			// Message: fmt.Sprintf("Subscription created with ID: %s", sub.Id),
-			// Slug:    slug,
+			Message:      "subscription created successfully",
+			Slug:         req.Msg.GetSlug(),
+			Subscription: sub,
 		},
 	}, nil
 }
 
-func (m *mServer) GetSubscriptionsAll(ctx context.Context) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error) {
-	subs, err := m.db.GetSubscriptionsAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-	out := make([]*mbotpb.Subscription, 0)
-	for _, s := range subs {
-		out = append(out, &mbotpb.Subscription{
-			Id:                 s.Id,
-			Slug:               s.Slug,
-			SubscriptionExpiry: s.SubscriptionExpiry,
-		})
-	}
-	return &connect.Response[mbotpb.GetSubscriptionsAllResponse]{
-		Msg: &mbotpb.GetSubscriptionsAllResponse{
-			Subscriptions: out,
-		},
-	}, nil
-}
-
-func (m *mServer) UpdateSubscription(ctx context.Context,
-	req *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error) {
-	err := m.db.UpdateSubscription(ctx,
-		req.Msg.GetId(),
-		req.Msg.GetSlug(),
-		req.Msg.GetSubscriptionExpiry(),
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &connect.Response[mbotpb.UpdateSubscriptionResponse]{
-		Msg: &mbotpb.UpdateSubscriptionResponse{
-			Message: fmt.Sprintf("Subscription updated with ID: %s", req.Msg.GetId()),
-		},
-	}, nil
-}
-
-func (m *mServer) DeleteSubscription(ctx context.Context,
-	req *connect.Request[mbotpb.DeleteSubscriptionRequest]) (*connect.Response[mbotpb.DeleteSubscriptionResponse], error) {
-	err := m.db.DeleteSubscription(ctx, req.Msg.GetId())
-	if err != nil {
-		return nil, err
-	}
-	return &connect.Response[mbotpb.DeleteSubscriptionResponse]{
-		Msg: &mbotpb.DeleteSubscriptionResponse{
-			Message: fmt.Sprintf("Subscription deleted with ID: %s", req.Msg.GetId()),
-		},
-	}, nil
-}
-
-func (m *mServer) GetSubcriptionByCustomer(ctx context.Context,
-	req *connect.Request[mbotpb.GetSubscriptionByCustomerRequest]) (*connect.Response[mbotpb.GetSubscriptionByCustomerResponse], error) {
-	sub, err := m.db.GetSubscriptionByCustomer(ctx, req.Msg.GetSlug())
-	if err != nil {
-		return nil, err
-	}
-	return &connect.Response[mbotpb.GetSubscriptionByCustomerResponse]{
-		Msg: &mbotpb.GetSubscriptionByCustomerResponse{
-			Subscription: &mbotpb.Subscription{
-				Id:                 sub.Id,
-				Slug:               sub.Slug,
-				SubscriptionExpiry: sub.SubscriptionExpiry,
-			},
-		},
-	}, nil
-}
-
-func (m *mServer) GetStatsByCustomer(ctx context.Context,
-	req *connect.Request[mbotpb.GetStatsByCustomerRequest]) (*connect.Response[mbotpb.GetStatsByCustomerResponse], error) {
-	stats, err := m.db.GetStatsByCustomer(ctx, req.Msg.GetSlug())
-	if err != nil {
-		return nil, err
-	}
-	return &connect.Response[mbotpb.GetStatsByCustomerResponse]{
-		Msg: &mbotpb.GetStatsByCustomerResponse{
-			Stats: &mbotpb.Stats{
-				Total: stats.Total,
-				Used:  stats.Used,
-			},
-		},
-	}, nil
-}
-
-func (m *mServer) GetStatsBySubscription(ctx context.Context,
-	req *connect.Request[mbotpb.GetStatsBySubscriptionRequest]) (*connect.Response[mbotpb.GetStatsBySubscriptionResponse], error) {
-	stats, err := m.db.GetStatsBySubscription(ctx, req.Msg.GetId())
-	if err != nil {
-		return nil, err
-	}
-	return &connect.Response[mbotpb.GetStatsBySubscriptionResponse]{
-		Msg: &mbotpb.GetStatsBySubscriptionResponse{
-			Stats: &mbotpb.Stats{
-				Total: stats.Total,
-				Used:  stats.Used,
-			},
-		},
-	}, nil
-}
-
-func (m *mServer) GetStatsAll(ctx context.Context) (*connect.Response[mbotpb.GetStatsAllResponse], error) {
-	stats, err := m.db.GetStatsAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-	out := make([]*mbotpb.Stats, 0)
-	for _, s := range stats {
-		out = append(out, &mbotpb.Stats{
-			Total: s.Total,
-			Used:  s.Used,
-		})
-	}
-	return &connect.Response[mbotpb.GetStatsAllResponse]{
-		Msg: &mbotpb.GetStatsAllResponse{
-			Stats: out,
-		},
-	}, nil
-}
+//
+// func (m *mServer) GetSubscriptionsAll(ctx context.Context) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error) {
+// 	subs, err := m.db.GetSubscriptionsAll(ctx)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	out := make([]*mbotpb.Subscription, 0)
+// 	for _, s := range subs {
+// 		out = append(out, &mbotpb.Subscription{
+// 			Id:                 s.Id,
+// 			Slug:               s.Slug,
+// 			SubscriptionExpiry: s.SubscriptionExpiry,
+// 		})
+// 	}
+// 	return &connect.Response[mbotpb.GetSubscriptionsAllResponse]{
+// 		Msg: &mbotpb.GetSubscriptionsAllResponse{
+// 			Subscriptions: out,
+// 		},
+// 	}, nil
+// }
+//
+// func (m *mServer) UpdateSubscription(ctx context.Context,
+// 	req *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error) {
+// 	err := m.db.UpdateSubscription(ctx,
+// 		req.Msg.GetId(),
+// 		req.Msg.GetSlug(),
+// 		req.Msg.GetSubscriptionExpiry(),
+// 	)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return &connect.Response[mbotpb.UpdateSubscriptionResponse]{
+// 		Msg: &mbotpb.UpdateSubscriptionResponse{
+// 			Message: fmt.Sprintf("Subscription updated with ID: %s", req.Msg.GetId()),
+// 		},
+// 	}, nil
+// }
+//
+// func (m *mServer) DeleteSubscription(ctx context.Context,
+// 	req *connect.Request[mbotpb.DeleteSubscriptionRequest]) (*connect.Response[mbotpb.DeleteSubscriptionResponse], error) {
+// 	err := m.db.DeleteSubscription(ctx, req.Msg.GetId())
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return &connect.Response[mbotpb.DeleteSubscriptionResponse]{
+// 		Msg: &mbotpb.DeleteSubscriptionResponse{
+// 			Message: fmt.Sprintf("Subscription deleted with ID: %s", req.Msg.GetId()),
+// 		},
+// 	}, nil
+// }
+//
+// func (m *mServer) GetSubcriptionByCustomer(ctx context.Context,
+// 	req *connect.Request[mbotpb.GetSubscriptionByCustomerRequest]) (*connect.Response[mbotpb.GetSubscriptionByCustomerResponse], error) {
+// 	sub, err := m.db.GetSubscriptionByCustomer(ctx, req.Msg.GetSlug())
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return &connect.Response[mbotpb.GetSubscriptionByCustomerResponse]{
+// 		Msg: &mbotpb.GetSubscriptionByCustomerResponse{
+// 			Subscription: &mbotpb.Subscription{
+// 				Id:                 sub.Id,
+// 				Slug:               sub.Slug,
+// 				SubscriptionExpiry: sub.SubscriptionExpiry,
+// 			},
+// 		},
+// 	}, nil
+// }
+//
+// func (m *mServer) GetStatsByCustomer(ctx context.Context,
+// 	req *connect.Request[mbotpb.GetStatsByCustomerRequest]) (*connect.Response[mbotpb.GetStatsByCustomerResponse], error) {
+// 	stats, err := m.db.GetStatsByCustomer(ctx, req.Msg.GetSlug())
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return &connect.Response[mbotpb.GetStatsByCustomerResponse]{
+// 		Msg: &mbotpb.GetStatsByCustomerResponse{
+// 			Stats: &mbotpb.Stats{
+// 				Total: stats.Total,
+// 				Used:  stats.Used,
+// 			},
+// 		},
+// 	}, nil
+// }
+//
+// func (m *mServer) GetStatsBySubscription(ctx context.Context,
+// 	req *connect.Request[mbotpb.GetStatsBySubscriptionRequest]) (*connect.Response[mbotpb.GetStatsBySubscriptionResponse], error) {
+// 	stats, err := m.db.GetStatsBySubscription(ctx, req.Msg.GetId())
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return &connect.Response[mbotpb.GetStatsBySubscriptionResponse]{
+// 		Msg: &mbotpb.GetStatsBySubscriptionResponse{
+// 			Stats: &mbotpb.Stats{
+// 				Total: stats.Total,
+// 				Used:  stats.Used,
+// 			},
+// 		},
+// 	}, nil
+// }
+//
+// func (m *mServer) GetStatsAll(ctx context.Context) (*connect.Response[mbotpb.GetStatsAllResponse], error) {
+// 	stats, err := m.db.GetStatsAll(ctx)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	out := make([]*mbotpb.Stats, 0)
+// 	for _, s := range stats {
+// 		out = append(out, &mbotpb.Stats{
+// 			Total: s.Total,
+// 			Used:  s.Used,
+// 		})
+// 	}
+// 	return &connect.Response[mbotpb.GetStatsAllResponse]{
+// 		Msg: &mbotpb.GetStatsAllResponse{
+// 			Stats: out,
+// 		},
+// 	}, nil
+// }

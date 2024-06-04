@@ -35,7 +35,26 @@ func initBucket(c *Client) error {
 		if err != nil {
 			return err
 		}
-
+		_, err = tx.CreateBucketIfNotExists(customerDeleteBucket)
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists(customerSlugDeleteBucket)
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists(customerSubscriptionDeleteBucket)
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists(subscriptionsBucket)
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists(customerSubscriptionBucket)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 }

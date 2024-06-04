@@ -4,6 +4,12 @@ modules:
 lint:
   use:
     - DEFAULT
+    - COMMENT_ENUM
+    - COMMENT_MESSAGE
+    - COMMENT_RPC
+    - COMMENT_SERVICE
+    - UNARY_RPC
+    - PACKAGE_NO_IMPORT_CYCLE
 breaking:
   use:
     - FILE

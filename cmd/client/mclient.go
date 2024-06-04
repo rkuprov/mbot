@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
@@ -24,4 +25,14 @@ func main() {
 	}
 
 	println(resp.Msg.String())
+
+	resp2, err := c.CreateSubscription(context.Background(), &connect.Request[mbotpb.CreateSubscriptionRequest]{Msg: &mbotpb.CreateSubscriptionRequest{
+		Slug:                  "john-doe",
+		SubscriptionStartDate: timestamppb.Now(),
+		Duration:              30,
+	}})
+	if err != nil {
+		panic(err)
+	}
+	println(resp2.Msg.String())
 }
