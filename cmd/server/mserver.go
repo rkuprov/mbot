@@ -13,15 +13,17 @@ import (
 
 type mServer struct {
 	mbotpbconnect.UnimplementedMBotServerServiceHandler
-	db *store.Client
+	db *store.Store
 }
 
 func (m *mServer) CreateCustomer(ctx context.Context,
 	req *connect.Request[mbotpb.CreateCustomerRequest]) (*connect.Response[mbotpb.CreateCustomerResponse], error) {
 	slug, err := m.db.CreateCustomer(ctx,
-		req.Msg.GetName(),
-		req.Msg.GetEmail(),
-		req.Msg.GetContact(),
+		store.CustomerCreate{
+			Name:    req.Msg.GetName(),
+			Email:   req.Msg.GetEmail(),
+			Contact: req.Msg.GetContact(),
+		},
 	)
 	if err != nil {
 		return nil, err
@@ -33,7 +35,7 @@ func (m *mServer) CreateCustomer(ctx context.Context,
 	return &connect.Response[mbotpb.CreateCustomerResponse]{
 		Msg: &mbotpb.CreateCustomerResponse{
 			Message:         fmt.Sprintf("Customer created with ID: %s", slug),
-			Slug:            c.GetSlug(),
+			Id:              c.GetId(),
 			SubscriptionIds: c.GetSubscriptionIds(),
 		},
 	}, nil
@@ -47,13 +49,7 @@ func (m *mServer) GetCustomersAll(ctx context.Context,
 	}
 	out := make([]*mbotpb.Customer, 0)
 	for _, c := range customers {
-		out = append(out, &mbotpb.Customer{
-			Slug:            c.GetSlug(),
-			Name:            c.GetName(),
-			Email:           c.GetEmail(),
-			Contact:         c.GetContact(),
-			SubscriptionIds: c.GetSubscriptionIds(),
-		})
+		out = append(out, &c)
 
 	}
 	return &connect.Response[mbotpb.GetCustomersAllResponse]{
@@ -72,7 +68,7 @@ func (m *mServer) GetCustomer(ctx context.Context,
 	return &connect.Response[mbotpb.GetCustomerResponse]{
 		Msg: &mbotpb.GetCustomerResponse{
 			Customer: &mbotpb.Customer{
-				Slug:            cust.Slug,
+				Id:              cust.Id,
 				Name:            cust.Name,
 				Email:           cust.Email,
 				Contact:         cust.Contact,
@@ -84,18 +80,24 @@ func (m *mServer) GetCustomer(ctx context.Context,
 
 func (m *mServer) UpdateCustomer(ctx context.Context,
 	req *connect.Request[mbotpb.UpdateCustomerRequest]) (*connect.Response[mbotpb.UpdateCustomerResponse], error) {
-	err := m.db.UpdateCustomer(ctx,
-		req.Msg.GetSlug(),
-		req.Msg.GetName(),
-		req.Msg.GetEmail(),
-		req.Msg.GetContact(),
+	err := m.db.UpdateCustomer(ctx, req.Msg.GetId(),
+		store.CustomerUpdate{
+			Name:    req.Msg.GetName(),
+			Email:   req.Msg.GetEmail(),
+			Contact: req.Msg.GetContact(),
+		},
 	)
+	if err != nil {
+		return nil, err
+	}
+	out, err := m.db.GetCustomer(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, err
 	}
 	return &connect.Response[mbotpb.UpdateCustomerResponse]{
 		Msg: &mbotpb.UpdateCustomerResponse{
-			Message: fmt.Sprintf("Customer updated with ID: %s", req.Msg.GetSlug()),
+			Message:  fmt.Sprintf("Customer updated successfully"),
+			Customer: &out,
 		},
 	}, nil
 
@@ -138,26 +140,37 @@ func (m *mServer) CreateSubscription(ctx context.Context,
 	}, nil
 }
 
-//
-// func (m *mServer) GetSubscriptionsAll(ctx context.Context) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error) {
-// 	subs, err := m.db.GetSubscriptionsAll(ctx)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	out := make([]*mbotpb.Subscription, 0)
-// 	for _, s := range subs {
-// 		out = append(out, &mbotpb.Subscription{
-// 			Id:                 s.Id,
-// 			Slug:               s.Slug,
-// 			SubscriptionExpiry: s.SubscriptionExpiry,
-// 		})
-// 	}
-// 	return &connect.Response[mbotpb.GetSubscriptionsAllResponse]{
-// 		Msg: &mbotpb.GetSubscriptionsAllResponse{
-// 			Subscriptions: out,
-// 		},
-// 	}, nil
-// }
+func (m *mServer) GetSubscriptionsAll(ctx context.Context) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error) {
+	// subs, err := m.db.GetSubscriptionsAll(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// custs, err := m.db.GetCustomersAll(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// out := make([]*mbotpb.GetSubscriptionResponse, 0)
+	// for _, s := range subs {
+	// 	for _, c := range custs {
+	// 		if c.GetSlug() == s.GetSlug() {
+	// 			cust = c.GetName()
+	// 			break
+	// 		}
+	// 	}
+	// 	out = append(out, &mbotpb.GetSubscriptionResponse{
+	// 		Slug:            s.GetSlug(),
+	// 		SubscriptionIds: s.GetSubscriptionIds(),
+	// 		Customer:        cust,
+	// 	})
+	// }
+
+	return &connect.Response[mbotpb.GetSubscriptionsAllResponse]{
+		Msg: &mbotpb.GetSubscriptionsAllResponse{
+			// Subscriptions: out,
+		},
+	}, nil
+}
+
 //
 // func (m *mServer) UpdateSubscription(ctx context.Context,
 // 	req *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error) {

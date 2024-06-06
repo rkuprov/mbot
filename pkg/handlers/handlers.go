@@ -16,7 +16,7 @@ func Status(ctx context.Context) http.HandlerFunc {
 	}
 }
 
-func Login(ctx context.Context, db *store.Client) http.HandlerFunc {
+func Login(ctx context.Context, db *store.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "token")
 

@@ -13,13 +13,13 @@ var (
 	ErrTokenNotFound = errors.New("token not found")
 )
 
-func (c *Client) ConfirmToken(ctx context.Context, token string) (bool, string) {
+func (s *Store) ConfirmToken(ctx context.Context, token string) (bool, string) {
 	if token == "" {
 		return false, ""
 	}
 
 	var validUntil []byte
-	err := c.db.View(func(tx *bbolt.Tx) error {
+	err := s.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte("token-client"))
 		validUntil = b.Get([]byte(token))
 		if len(validUntil) == 0 {
@@ -39,9 +39,9 @@ func (c *Client) ConfirmToken(ctx context.Context, token string) (bool, string) 
 	return true, date
 }
 
-func (c *Client) CreateToken(ctx context.Context, validUntil time.Time) string {
+func (s *Store) CreateToken(ctx context.Context, validUntil time.Time) string {
 	token := uuid.New().String()
-	err := c.db.Update(func(tx *bbolt.Tx) error {
+	err := s.db.Update(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte("tokens-customer"))
 		return b.Put([]byte(token), []byte(validUntil.Format("2006-01-02 15:04:05")))
 	})
