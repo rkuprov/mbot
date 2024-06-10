@@ -30,12 +30,13 @@ DELETED (slug -> CUSTOMER)
 */
 
 var (
-	// slug -> customer
-	customerBucket                   = []byte("customers")
-	customerSlugBucket               = []byte("customer-slug")
-	customerDeleteBucket             = []byte("customer-delete")
-	customerSlugDeleteBucket         = []byte("customer-slug-delete")
-	customerSubscriptionDeleteBucket = []byte("customer-subscription-delete")
+	// id -> CUSTOMER
+	customersBucket = []byte("customers")
+	// id -> CUSTOMER
+	customersDeleteBucket = []byte("customers-delete")
+
+	// CUSTOMER -> "customer", "subscriptions", "stats"
+	customerData = []byte("customer")
 )
 
 type Store struct {
@@ -55,13 +56,21 @@ func NewClient(ctx context.Context) (*Store, func() error) {
 	return c, db.Close
 }
 
+func NewWithClient(_ context.Context, db *bbolt.DB) (*Store, error) {
+	c := &Store{db: db}
+	if err := initBucket(c); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
 func initBucket(c *Store) error {
 	return c.db.Update(func(tx *bbolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists(customerBucket)
+		_, err := tx.CreateBucketIfNotExists(customersBucket)
 		if err != nil {
 			return err
 		}
-		_, err = tx.CreateBucketIfNotExists(customerDeleteBucket)
+		_, err = tx.CreateBucketIfNotExists(customersDeleteBucket)
 		if err != nil {
 			return err
 		}

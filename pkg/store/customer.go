@@ -25,23 +25,33 @@ type CustomerCreate struct {
 }
 type CustomerUpdate = CustomerCreate
 
-func (s *Store) CreateCustomer(_ context.Context, customer CustomerCreate) (string, error) {
+func (s *Store) CreateCustomer(_ context.Context, in CustomerCreate) (string, error) {
 	tx, err := s.db.Begin(true)
 	if err != nil {
 		return "", err
 	}
 	defer tx.Rollback()
 
-	customerB := tx.Bucket(customerBucket)
-	cB, err := customerB.CreateBucketIfNotExists([]byte("customer"))
+	customerB := tx.Bucket(customersBucket)
+	id, err := customerB.NextSequence()
 	if err != nil {
 		return "", err
 	}
-	id, err := cB.NextSequence()
+
+	cB, err := customerB.CreateBucketIfNotExists([]byte(strconv.FormatUint(id, 10)))
 	if err != nil {
 		return "", err
 	}
-	if err = putIntoBucket(cB, strconv.FormatUint(id, 10), customer); err != nil {
+	_, err = cB.CreateBucketIfNotExists(subscriptions)
+	if err != nil {
+		return "", err
+	}
+	cd, err := cB.CreateBucketIfNotExists(customerData)
+	if err != nil {
+		return "", err
+	}
+
+	if err = putIntoBucket(cd, strconv.FormatUint(id, 10), in); err != nil {
 		return "", err
 	}
 	err = tx.Commit()
@@ -58,15 +68,12 @@ func (s *Store) GetCustomer(_ context.Context, id string) (mbotpb.Customer, erro
 	var customerDb Customer
 	var subIds []string
 	err := s.db.View(func(tx *bbolt.Tx) error {
-		root := tx.Bucket(customerBucket)
-		c := root.Bucket([]byte("customer"))
-		val := c.Get(bId)
+		root := tx.Bucket(customersBucket)
+		cB := root.Bucket(bId)
+		val := cB.Bucket(customerData).Get(bId)
 		if val == nil {
 			return fmt.Errorf("customer with ID %s not found", id)
 		}
-
-		subs := root.Bucket([]byte("subscriptions"))
-		subIds = strings.Split(string(subs.Get(bId)), "#")
 
 		return json.Unmarshal(val, &customerDb)
 	})
@@ -87,15 +94,25 @@ func (s *Store) GetCustomersAll(_ context.Context) ([]mbotpb.Customer, error) {
 	var customers []mbotpb.Customer
 
 	err := s.db.View(func(tx *bbolt.Tx) error {
-		root := tx.Bucket(customerBucket)
-		c := root.Bucket([]byte("customer"))
-		return c.ForEach(func(k, v []byte) error {
+		root := tx.Bucket(customersBucket)
+		c := root.Cursor()
+		for k, _ := c.First(); k != nil; k, _ = c.Next() {
+
 			var customerDb Customer
-			if err := json.Unmarshal(v, &customerDb); err != nil {
+			cd := root.Bucket(k).Bucket(customerData).Get(k)
+			if cd == nil {
+				return fmt.Errorf("customer with ID %s not found", k)
+			}
+			if err := json.Unmarshal(cd, &customerDb); err != nil {
 				return err
 			}
-			subs := root.Bucket([]byte("subscriptions"))
-			subIds := strings.Split(string(subs.Get(k)), "#")
+
+			var subIds []string
+			subs := root.Bucket(k).Bucket(subscriptions).Get(k)
+			if subs != nil {
+				subIds = strings.Split(string(subs), "#")
+			}
+
 			customers = append(customers, mbotpb.Customer{
 				Id:              customerDb.ID,
 				Name:            customerDb.Name,
@@ -103,82 +120,29 @@ func (s *Store) GetCustomersAll(_ context.Context) ([]mbotpb.Customer, error) {
 				Contact:         customerDb.Contact,
 				SubscriptionIds: subIds,
 			})
-			return nil
-		})
+		}
+
+		return nil
 	})
 	if err != nil {
 		return nil, err
-
 	}
 
 	return customers, nil
 }
 
-func (s *Store) UpdateCustomer(_ context.Context, id string, customer CustomerUpdate) error {
+func (s *Store) UpdateCustomer(_ context.Context, id string, in CustomerUpdate) error {
+	bId := []byte(id)
 	return s.db.Update(func(tx *bbolt.Tx) error {
-		root := tx.Bucket(customerBucket)
-		c := root.Bucket([]byte("customer"))
-		val := c.Get([]byte(id))
-		if len(val) == 0 {
+		root := tx.Bucket(customersBucket)
+		cB := root.Bucket(bId)
+		val := cB.Bucket(customerData).Get(bId)
+		if val == nil {
 			return fmt.Errorf("customer with ID %s not found", id)
 		}
 
-		if err := putIntoBucket(c, id, customer); err != nil {
-			return err
-		}
-
-		return nil
+		return putIntoBucket(cB.Bucket(customerData), id, in)
 	})
-}
-
-func (s *Store) DeleteCustomer(_ context.Context, id string) error {
-	bId := []byte(id)
-
-	tx, err := s.db.Begin(true)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	var customerToDelete []byte
-	var subIds []byte
-
-	root := tx.Bucket(customerBucket)
-	c := root.Bucket([]byte("customer"))
-	customerToDelete = c.Get(bId)
-	if customerToDelete == nil {
-		return fmt.Errorf("customer with ID %s not found", id)
-	}
-	err = c.Delete(bId)
-	if err != nil {
-		return err
-	}
-	subs := root.Bucket(subscriptionsBucket)
-	subIds = subs.Get(bId)
-	err = subs.Delete(bId)
-	if err != nil {
-		return err
-	}
-
-	root = tx.Bucket(customerDeleteBucket)
-	c, err = root.CreateBucketIfNotExists([]byte("customer"))
-	if err != nil {
-		return err
-	}
-	err = c.Put(bId, customerToDelete)
-	if err != nil {
-		return err
-	}
-	c, err = root.CreateBucketIfNotExists([]byte("subscriptions"))
-	if err != nil {
-		return err
-	}
-	err = c.Put(bId, subIds)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func putIntoBucket(b *bbolt.Bucket, id string, data any) error {
