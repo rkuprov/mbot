@@ -45,9 +45,6 @@ const (
 	// MBotServerServiceUpdateCustomerProcedure is the fully-qualified name of the MBotServerService's
 	// UpdateCustomer RPC.
 	MBotServerServiceUpdateCustomerProcedure = "/mbot.MBotServerService/UpdateCustomer"
-	// MBotServerServiceDeleteCustomerProcedure is the fully-qualified name of the MBotServerService's
-	// DeleteCustomer RPC.
-	MBotServerServiceDeleteCustomerProcedure = "/mbot.MBotServerService/DeleteCustomer"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -57,7 +54,6 @@ var (
 	mBotServerServiceGetCustomerMethodDescriptor     = mBotServerServiceServiceDescriptor.Methods().ByName("GetCustomer")
 	mBotServerServiceGetCustomersAllMethodDescriptor = mBotServerServiceServiceDescriptor.Methods().ByName("GetCustomersAll")
 	mBotServerServiceUpdateCustomerMethodDescriptor  = mBotServerServiceServiceDescriptor.Methods().ByName("UpdateCustomer")
-	mBotServerServiceDeleteCustomerMethodDescriptor  = mBotServerServiceServiceDescriptor.Methods().ByName("DeleteCustomer")
 )
 
 // MBotServerServiceClient is a client for the mbot.MBotServerService service.
@@ -66,7 +62,6 @@ type MBotServerServiceClient interface {
 	GetCustomer(context.Context, *connect.Request[mbotpb.GetCustomerRequest]) (*connect.Response[mbotpb.GetCustomerResponse], error)
 	GetCustomersAll(context.Context, *connect.Request[mbotpb.GetCustomersAllRequest]) (*connect.Response[mbotpb.GetCustomersAllResponse], error)
 	UpdateCustomer(context.Context, *connect.Request[mbotpb.UpdateCustomerRequest]) (*connect.Response[mbotpb.UpdateCustomerResponse], error)
-	DeleteCustomer(context.Context, *connect.Request[mbotpb.DeleteCustomerRequest]) (*connect.Response[mbotpb.DeleteCustomerResponse], error)
 }
 
 // NewMBotServerServiceClient constructs a client for the mbot.MBotServerService service. By
@@ -103,12 +98,6 @@ func NewMBotServerServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(mBotServerServiceUpdateCustomerMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		deleteCustomer: connect.NewClient[mbotpb.DeleteCustomerRequest, mbotpb.DeleteCustomerResponse](
-			httpClient,
-			baseURL+MBotServerServiceDeleteCustomerProcedure,
-			connect.WithSchema(mBotServerServiceDeleteCustomerMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
@@ -118,7 +107,6 @@ type mBotServerServiceClient struct {
 	getCustomer     *connect.Client[mbotpb.GetCustomerRequest, mbotpb.GetCustomerResponse]
 	getCustomersAll *connect.Client[mbotpb.GetCustomersAllRequest, mbotpb.GetCustomersAllResponse]
 	updateCustomer  *connect.Client[mbotpb.UpdateCustomerRequest, mbotpb.UpdateCustomerResponse]
-	deleteCustomer  *connect.Client[mbotpb.DeleteCustomerRequest, mbotpb.DeleteCustomerResponse]
 }
 
 // CreateCustomer calls mbot.MBotServerService.CreateCustomer.
@@ -141,18 +129,12 @@ func (c *mBotServerServiceClient) UpdateCustomer(ctx context.Context, req *conne
 	return c.updateCustomer.CallUnary(ctx, req)
 }
 
-// DeleteCustomer calls mbot.MBotServerService.DeleteCustomer.
-func (c *mBotServerServiceClient) DeleteCustomer(ctx context.Context, req *connect.Request[mbotpb.DeleteCustomerRequest]) (*connect.Response[mbotpb.DeleteCustomerResponse], error) {
-	return c.deleteCustomer.CallUnary(ctx, req)
-}
-
 // MBotServerServiceHandler is an implementation of the mbot.MBotServerService service.
 type MBotServerServiceHandler interface {
 	CreateCustomer(context.Context, *connect.Request[mbotpb.CreateCustomerRequest]) (*connect.Response[mbotpb.CreateCustomerResponse], error)
 	GetCustomer(context.Context, *connect.Request[mbotpb.GetCustomerRequest]) (*connect.Response[mbotpb.GetCustomerResponse], error)
 	GetCustomersAll(context.Context, *connect.Request[mbotpb.GetCustomersAllRequest]) (*connect.Response[mbotpb.GetCustomersAllResponse], error)
 	UpdateCustomer(context.Context, *connect.Request[mbotpb.UpdateCustomerRequest]) (*connect.Response[mbotpb.UpdateCustomerResponse], error)
-	DeleteCustomer(context.Context, *connect.Request[mbotpb.DeleteCustomerRequest]) (*connect.Response[mbotpb.DeleteCustomerResponse], error)
 }
 
 // NewMBotServerServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -185,12 +167,6 @@ func NewMBotServerServiceHandler(svc MBotServerServiceHandler, opts ...connect.H
 		connect.WithSchema(mBotServerServiceUpdateCustomerMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	mBotServerServiceDeleteCustomerHandler := connect.NewUnaryHandler(
-		MBotServerServiceDeleteCustomerProcedure,
-		svc.DeleteCustomer,
-		connect.WithSchema(mBotServerServiceDeleteCustomerMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/mbot.MBotServerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case MBotServerServiceCreateCustomerProcedure:
@@ -201,8 +177,6 @@ func NewMBotServerServiceHandler(svc MBotServerServiceHandler, opts ...connect.H
 			mBotServerServiceGetCustomersAllHandler.ServeHTTP(w, r)
 		case MBotServerServiceUpdateCustomerProcedure:
 			mBotServerServiceUpdateCustomerHandler.ServeHTTP(w, r)
-		case MBotServerServiceDeleteCustomerProcedure:
-			mBotServerServiceDeleteCustomerHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -226,8 +200,4 @@ func (UnimplementedMBotServerServiceHandler) GetCustomersAll(context.Context, *c
 
 func (UnimplementedMBotServerServiceHandler) UpdateCustomer(context.Context, *connect.Request[mbotpb.UpdateCustomerRequest]) (*connect.Response[mbotpb.UpdateCustomerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.UpdateCustomer is not implemented"))
-}
-
-func (UnimplementedMBotServerServiceHandler) DeleteCustomer(context.Context, *connect.Request[mbotpb.DeleteCustomerRequest]) (*connect.Response[mbotpb.DeleteCustomerResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.DeleteCustomer is not implemented"))
 }
