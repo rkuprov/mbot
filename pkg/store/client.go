@@ -35,7 +35,7 @@ var (
 	// id -> CUSTOMER
 	customersDeleteBucket = []byte("customers-delete")
 
-	subscriptionsLUT = []byte("subscriptions-lut")
+	subscriptions = []byte("subscriptions")
 	// CUSTOMER -> "customer", "subscriptions", "stats"
 	customerData = []byte("customer")
 )
@@ -71,7 +71,11 @@ func initBucket(c *Store) error {
 		if err != nil {
 			return err
 		}
-		_, err = tx.CreateBucketIfNotExists(subscriptionsLUT)
+		_, err = tx.CreateBucketIfNotExists(subscriptions)
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists(subscription_customer)
 		if err != nil {
 			return err
 		}

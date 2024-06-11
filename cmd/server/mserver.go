@@ -119,11 +119,7 @@ func (m *mServer) DeleteCustomer(ctx context.Context,
 func (m *mServer) CreateSubscription(ctx context.Context,
 	req *connect.Request[mbotpb.CreateSubscriptionRequest]) (*connect.Response[mbotpb.CreateSubscriptionResponse], error) {
 	start := req.Msg.GetSubscriptionStartDate().AsTime().Format("2006-01-02")
-	id, err := m.db.CreateSubscription(ctx,
-		req.Msg.GetSlug(),
-		start,
-		int(req.Msg.GetDuration()),
-	)
+	id, err := m.db.CreateSubscription(ctx)
 	if err != nil {
 		return nil, err
 	}

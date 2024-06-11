@@ -16,9 +16,9 @@ service MBotServerService {
   rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse) {}
   rpc GetSubscription(GetSubscriptionRequest) returns (GetSubscriptionResponse) {}
   rpc GetSubscriptionsAll(GetSubscriptionsAllRequest) returns (GetSubscriptionsAllResponse) {}
-//  rpc UpdateSubscription(UpdateSubscriptionRequest) returns (UpdateSubscriptionResponse) {}
+  rpc UpdateSubscription(UpdateSubscriptionRequest) returns (UpdateSubscriptionResponse) {}
 //  rpc DeleteSubscription(DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse) {}
-//  rpc GetSubscriptionByCustomer(GetSubscriptionByCustomerRequest) returns (GetSubscriptionByCustomerResponse) {}
+  rpc GetSubscriptionByCustomer(GetSubscriptionByCustomerRequest) returns (GetSubscriptionByCustomerResponse) {}
 //
 //  rpc GetStatsByCustomer(GetStatsByCustomerRequest) returns (GetStatsByCustomerResponse) {}
 //  rpc GetStatsBySubscription(GetStatsBySubscriptionRequest) returns (GetStatsBySubscriptionResponse) {}
