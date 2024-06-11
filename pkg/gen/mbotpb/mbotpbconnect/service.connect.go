@@ -45,15 +45,27 @@ const (
 	// MBotServerServiceUpdateCustomerProcedure is the fully-qualified name of the MBotServerService's
 	// UpdateCustomer RPC.
 	MBotServerServiceUpdateCustomerProcedure = "/mbot.MBotServerService/UpdateCustomer"
+	// MBotServerServiceCreateSubscriptionProcedure is the fully-qualified name of the
+	// MBotServerService's CreateSubscription RPC.
+	MBotServerServiceCreateSubscriptionProcedure = "/mbot.MBotServerService/CreateSubscription"
+	// MBotServerServiceGetSubscriptionProcedure is the fully-qualified name of the MBotServerService's
+	// GetSubscription RPC.
+	MBotServerServiceGetSubscriptionProcedure = "/mbot.MBotServerService/GetSubscription"
+	// MBotServerServiceGetSubscriptionsAllProcedure is the fully-qualified name of the
+	// MBotServerService's GetSubscriptionsAll RPC.
+	MBotServerServiceGetSubscriptionsAllProcedure = "/mbot.MBotServerService/GetSubscriptionsAll"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	mBotServerServiceServiceDescriptor               = mbotpb.File_service_proto.Services().ByName("MBotServerService")
-	mBotServerServiceCreateCustomerMethodDescriptor  = mBotServerServiceServiceDescriptor.Methods().ByName("CreateCustomer")
-	mBotServerServiceGetCustomerMethodDescriptor     = mBotServerServiceServiceDescriptor.Methods().ByName("GetCustomer")
-	mBotServerServiceGetCustomersAllMethodDescriptor = mBotServerServiceServiceDescriptor.Methods().ByName("GetCustomersAll")
-	mBotServerServiceUpdateCustomerMethodDescriptor  = mBotServerServiceServiceDescriptor.Methods().ByName("UpdateCustomer")
+	mBotServerServiceServiceDescriptor                   = mbotpb.File_service_proto.Services().ByName("MBotServerService")
+	mBotServerServiceCreateCustomerMethodDescriptor      = mBotServerServiceServiceDescriptor.Methods().ByName("CreateCustomer")
+	mBotServerServiceGetCustomerMethodDescriptor         = mBotServerServiceServiceDescriptor.Methods().ByName("GetCustomer")
+	mBotServerServiceGetCustomersAllMethodDescriptor     = mBotServerServiceServiceDescriptor.Methods().ByName("GetCustomersAll")
+	mBotServerServiceUpdateCustomerMethodDescriptor      = mBotServerServiceServiceDescriptor.Methods().ByName("UpdateCustomer")
+	mBotServerServiceCreateSubscriptionMethodDescriptor  = mBotServerServiceServiceDescriptor.Methods().ByName("CreateSubscription")
+	mBotServerServiceGetSubscriptionMethodDescriptor     = mBotServerServiceServiceDescriptor.Methods().ByName("GetSubscription")
+	mBotServerServiceGetSubscriptionsAllMethodDescriptor = mBotServerServiceServiceDescriptor.Methods().ByName("GetSubscriptionsAll")
 )
 
 // MBotServerServiceClient is a client for the mbot.MBotServerService service.
@@ -62,6 +74,9 @@ type MBotServerServiceClient interface {
 	GetCustomer(context.Context, *connect.Request[mbotpb.GetCustomerRequest]) (*connect.Response[mbotpb.GetCustomerResponse], error)
 	GetCustomersAll(context.Context, *connect.Request[mbotpb.GetCustomersAllRequest]) (*connect.Response[mbotpb.GetCustomersAllResponse], error)
 	UpdateCustomer(context.Context, *connect.Request[mbotpb.UpdateCustomerRequest]) (*connect.Response[mbotpb.UpdateCustomerResponse], error)
+	CreateSubscription(context.Context, *connect.Request[mbotpb.CreateSubscriptionRequest]) (*connect.Response[mbotpb.CreateSubscriptionResponse], error)
+	GetSubscription(context.Context, *connect.Request[mbotpb.GetSubscriptionRequest]) (*connect.Response[mbotpb.GetSubscriptionResponse], error)
+	GetSubscriptionsAll(context.Context, *connect.Request[mbotpb.GetSubscriptionsAllRequest]) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error)
 }
 
 // NewMBotServerServiceClient constructs a client for the mbot.MBotServerService service. By
@@ -98,15 +113,36 @@ func NewMBotServerServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(mBotServerServiceUpdateCustomerMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		createSubscription: connect.NewClient[mbotpb.CreateSubscriptionRequest, mbotpb.CreateSubscriptionResponse](
+			httpClient,
+			baseURL+MBotServerServiceCreateSubscriptionProcedure,
+			connect.WithSchema(mBotServerServiceCreateSubscriptionMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getSubscription: connect.NewClient[mbotpb.GetSubscriptionRequest, mbotpb.GetSubscriptionResponse](
+			httpClient,
+			baseURL+MBotServerServiceGetSubscriptionProcedure,
+			connect.WithSchema(mBotServerServiceGetSubscriptionMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getSubscriptionsAll: connect.NewClient[mbotpb.GetSubscriptionsAllRequest, mbotpb.GetSubscriptionsAllResponse](
+			httpClient,
+			baseURL+MBotServerServiceGetSubscriptionsAllProcedure,
+			connect.WithSchema(mBotServerServiceGetSubscriptionsAllMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // mBotServerServiceClient implements MBotServerServiceClient.
 type mBotServerServiceClient struct {
-	createCustomer  *connect.Client[mbotpb.CreateCustomerRequest, mbotpb.CreateCustomerResponse]
-	getCustomer     *connect.Client[mbotpb.GetCustomerRequest, mbotpb.GetCustomerResponse]
-	getCustomersAll *connect.Client[mbotpb.GetCustomersAllRequest, mbotpb.GetCustomersAllResponse]
-	updateCustomer  *connect.Client[mbotpb.UpdateCustomerRequest, mbotpb.UpdateCustomerResponse]
+	createCustomer      *connect.Client[mbotpb.CreateCustomerRequest, mbotpb.CreateCustomerResponse]
+	getCustomer         *connect.Client[mbotpb.GetCustomerRequest, mbotpb.GetCustomerResponse]
+	getCustomersAll     *connect.Client[mbotpb.GetCustomersAllRequest, mbotpb.GetCustomersAllResponse]
+	updateCustomer      *connect.Client[mbotpb.UpdateCustomerRequest, mbotpb.UpdateCustomerResponse]
+	createSubscription  *connect.Client[mbotpb.CreateSubscriptionRequest, mbotpb.CreateSubscriptionResponse]
+	getSubscription     *connect.Client[mbotpb.GetSubscriptionRequest, mbotpb.GetSubscriptionResponse]
+	getSubscriptionsAll *connect.Client[mbotpb.GetSubscriptionsAllRequest, mbotpb.GetSubscriptionsAllResponse]
 }
 
 // CreateCustomer calls mbot.MBotServerService.CreateCustomer.
@@ -129,12 +165,30 @@ func (c *mBotServerServiceClient) UpdateCustomer(ctx context.Context, req *conne
 	return c.updateCustomer.CallUnary(ctx, req)
 }
 
+// CreateSubscription calls mbot.MBotServerService.CreateSubscription.
+func (c *mBotServerServiceClient) CreateSubscription(ctx context.Context, req *connect.Request[mbotpb.CreateSubscriptionRequest]) (*connect.Response[mbotpb.CreateSubscriptionResponse], error) {
+	return c.createSubscription.CallUnary(ctx, req)
+}
+
+// GetSubscription calls mbot.MBotServerService.GetSubscription.
+func (c *mBotServerServiceClient) GetSubscription(ctx context.Context, req *connect.Request[mbotpb.GetSubscriptionRequest]) (*connect.Response[mbotpb.GetSubscriptionResponse], error) {
+	return c.getSubscription.CallUnary(ctx, req)
+}
+
+// GetSubscriptionsAll calls mbot.MBotServerService.GetSubscriptionsAll.
+func (c *mBotServerServiceClient) GetSubscriptionsAll(ctx context.Context, req *connect.Request[mbotpb.GetSubscriptionsAllRequest]) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error) {
+	return c.getSubscriptionsAll.CallUnary(ctx, req)
+}
+
 // MBotServerServiceHandler is an implementation of the mbot.MBotServerService service.
 type MBotServerServiceHandler interface {
 	CreateCustomer(context.Context, *connect.Request[mbotpb.CreateCustomerRequest]) (*connect.Response[mbotpb.CreateCustomerResponse], error)
 	GetCustomer(context.Context, *connect.Request[mbotpb.GetCustomerRequest]) (*connect.Response[mbotpb.GetCustomerResponse], error)
 	GetCustomersAll(context.Context, *connect.Request[mbotpb.GetCustomersAllRequest]) (*connect.Response[mbotpb.GetCustomersAllResponse], error)
 	UpdateCustomer(context.Context, *connect.Request[mbotpb.UpdateCustomerRequest]) (*connect.Response[mbotpb.UpdateCustomerResponse], error)
+	CreateSubscription(context.Context, *connect.Request[mbotpb.CreateSubscriptionRequest]) (*connect.Response[mbotpb.CreateSubscriptionResponse], error)
+	GetSubscription(context.Context, *connect.Request[mbotpb.GetSubscriptionRequest]) (*connect.Response[mbotpb.GetSubscriptionResponse], error)
+	GetSubscriptionsAll(context.Context, *connect.Request[mbotpb.GetSubscriptionsAllRequest]) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error)
 }
 
 // NewMBotServerServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -167,6 +221,24 @@ func NewMBotServerServiceHandler(svc MBotServerServiceHandler, opts ...connect.H
 		connect.WithSchema(mBotServerServiceUpdateCustomerMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	mBotServerServiceCreateSubscriptionHandler := connect.NewUnaryHandler(
+		MBotServerServiceCreateSubscriptionProcedure,
+		svc.CreateSubscription,
+		connect.WithSchema(mBotServerServiceCreateSubscriptionMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	mBotServerServiceGetSubscriptionHandler := connect.NewUnaryHandler(
+		MBotServerServiceGetSubscriptionProcedure,
+		svc.GetSubscription,
+		connect.WithSchema(mBotServerServiceGetSubscriptionMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	mBotServerServiceGetSubscriptionsAllHandler := connect.NewUnaryHandler(
+		MBotServerServiceGetSubscriptionsAllProcedure,
+		svc.GetSubscriptionsAll,
+		connect.WithSchema(mBotServerServiceGetSubscriptionsAllMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/mbot.MBotServerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case MBotServerServiceCreateCustomerProcedure:
@@ -177,6 +249,12 @@ func NewMBotServerServiceHandler(svc MBotServerServiceHandler, opts ...connect.H
 			mBotServerServiceGetCustomersAllHandler.ServeHTTP(w, r)
 		case MBotServerServiceUpdateCustomerProcedure:
 			mBotServerServiceUpdateCustomerHandler.ServeHTTP(w, r)
+		case MBotServerServiceCreateSubscriptionProcedure:
+			mBotServerServiceCreateSubscriptionHandler.ServeHTTP(w, r)
+		case MBotServerServiceGetSubscriptionProcedure:
+			mBotServerServiceGetSubscriptionHandler.ServeHTTP(w, r)
+		case MBotServerServiceGetSubscriptionsAllProcedure:
+			mBotServerServiceGetSubscriptionsAllHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -200,4 +278,16 @@ func (UnimplementedMBotServerServiceHandler) GetCustomersAll(context.Context, *c
 
 func (UnimplementedMBotServerServiceHandler) UpdateCustomer(context.Context, *connect.Request[mbotpb.UpdateCustomerRequest]) (*connect.Response[mbotpb.UpdateCustomerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.UpdateCustomer is not implemented"))
+}
+
+func (UnimplementedMBotServerServiceHandler) CreateSubscription(context.Context, *connect.Request[mbotpb.CreateSubscriptionRequest]) (*connect.Response[mbotpb.CreateSubscriptionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.CreateSubscription is not implemented"))
+}
+
+func (UnimplementedMBotServerServiceHandler) GetSubscription(context.Context, *connect.Request[mbotpb.GetSubscriptionRequest]) (*connect.Response[mbotpb.GetSubscriptionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.GetSubscription is not implemented"))
+}
+
+func (UnimplementedMBotServerServiceHandler) GetSubscriptionsAll(context.Context, *connect.Request[mbotpb.GetSubscriptionsAllRequest]) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.GetSubscriptionsAll is not implemented"))
 }

@@ -35,6 +35,7 @@ var (
 	// id -> CUSTOMER
 	customersDeleteBucket = []byte("customers-delete")
 
+	subscriptionsLUT = []byte("subscriptions-lut")
 	// CUSTOMER -> "customer", "subscriptions", "stats"
 	customerData = []byte("customer")
 )
@@ -67,6 +68,10 @@ func NewWithClient(_ context.Context, db *bbolt.DB) (*Store, error) {
 func initBucket(c *Store) error {
 	return c.db.Update(func(tx *bbolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists(customersBucket)
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists(subscriptionsLUT)
 		if err != nil {
 			return err
 		}

@@ -20,53 +20,64 @@ var (
 	subscriptions = []byte("subscriptions")
 )
 
-func (s *Store) CreateSubscription(ctx context.Context, customerID, startDate string, duration int) (string, error) {
-	// ts, err := time.ParseInLocation(subscriptionFormat, startDate, time.FixedZone("MST", -7))
-	// if err != nil {
-	// 	return "", fmt.Errorf("failed to parse expiration date: %w", err)
-	// }
-	// expiry := ts.UTC().Add(time.Hour * 24 * time.Duration(duration)).Unix()
-	// subID := uuid.New().String()
-	// tx, err := s.db.Begin(true)
-	// if err != nil {
-	// 	return "", err
-	// }
-	// defer tx.Rollback()
-	//
-	// root := tx.Bucket(customersBucket)
+// CreateSubscription creates a new subscription for a customer in the Customers bucket as well as in the SubscriptionsLUT one
+// for a quicker lookup from the endpoint.
+func (s *Store) CreateSubscription(_ context.Context, customerID, startDate string, duration int) (string, error) {
+	cId := []byte(customerID)
+	var id string
 
-	// return subID, nil
-	return "", nil
+	t, err := time.Parse(subscriptionFormat, startDate)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse start date: %w", err)
+	}
+	expiry := t.Add(time.Duration(duration) * 24 * time.Hour)
+
+	err = s.db.Update(func(tx *bbolt.Tx) error {
+		var uid uint64
+		uid, err = tx.Bucket(customersBucket).Bucket(cId).Bucket(subscriptions).NextSequence()
+		id = strconv.FormatUint(uid, 10)
+
+		err = tx.Bucket(customersBucket).Bucket(cId).Bucket(subscriptions).Put(
+			[]byte(id),
+			[]byte(strconv.FormatInt(expiry.Unix(), 10)),
+		)
+		if err != nil {
+			return fmt.Errorf("failed to create subscription: %w", err)
+		}
+
+		return tx.Bucket(subscriptionsLUT).Put([]byte(id), []byte((strconv.FormatInt(expiry.Unix(), 10))))
+	})
+
+	return id, nil
 }
 
-func (s *Store) GetSubscription(ctx context.Context, id string) (*mbotpb.Subscription, error) {
-	var exp int64
+func (s *Store) GetSubscription(_ context.Context, id string) (*mbotpb.Subscription, error) {
+	var out *mbotpb.Subscription
 	err := s.db.View(func(tx *bbolt.Tx) error {
-		b := tx.Bucket(subscriptions)
-		expiryStr := b.Get([]byte(id))
-		if expiryStr == nil {
+		v := tx.Bucket(subscriptionsLUT).Get([]byte(id))
+		if v == nil {
 			return fmt.Errorf("subscription not found")
 		}
-		var err error
-		exp, err = strconv.ParseInt(string(expiryStr), 10, 64)
+		expiry, err := strconv.ParseInt(string(v), 10, 64)
 		if err != nil {
 			return fmt.Errorf("failed to parse expiry: %w", err)
+		}
+		out = &mbotpb.Subscription{
+			SubscriptionId:     id,
+			SubscriptionExpiry: timestamppb.New(time.Unix(expiry, 0)),
 		}
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	return &mbotpb.Subscription{
-		SubscriptionId:     id,
-		SubscriptionExpiry: timestamppb.New(time.Unix(exp, 0)),
-	}, nil
+	return out, nil
 }
 
-func (s *Store) GetSubscriptionsAll(ctx context.Context) ([]*mbotpb.Subscription, error) {
+func (s *Store) GetSubscriptionsAll(_ context.Context) ([]*mbotpb.Subscription, error) {
 	var out []*mbotpb.Subscription
 	err := s.db.View(func(tx *bbolt.Tx) error {
-		cs := tx.Bucket(subscriptions)
+		cs := tx.Bucket(subscriptionsLUT)
 		err := cs.ForEach(func(k, v []byte) error {
 			expiry, err := strconv.ParseInt(string(v), 10, 64)
 			if err != nil {
