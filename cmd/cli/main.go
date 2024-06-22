@@ -6,12 +6,14 @@ import (
 
 	"github.com/alecthomas/kong"
 
+	"github.com/rkuprov/mbot/cmd/cli/internal/commands/add"
 	"github.com/rkuprov/mbot/cmd/cli/internal/commands/auth"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 )
 
 type Options struct {
 	GetToken auth.Cmd `cmd:"" help:"Authenticate a user and grant them a session token"`
+	Add      add.Cmd  `cmd:"" help:"Add various entities to the database"`
 }
 
 func main() {
