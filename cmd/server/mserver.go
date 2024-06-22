@@ -123,7 +123,7 @@ func (m *mServer) CreateSubscription(ctx context.Context,
 	req *connect.Request[mbotpb.CreateSubscriptionRequest]) (*connect.Response[mbotpb.CreateSubscriptionResponse], error) {
 	start := req.Msg.GetSubscriptionStartDate().AsTime().Format("2006-01-02")
 	id, err := m.db.CreateSubscription(ctx, store.SubscriptionCreate{
-		CustomerID: req.Msg.GetSlug(),
+		CustomerID: req.Msg.GetCustomerId(),
 		StartDate:  start,
 		Duration:   int(req.Msg.GetDuration()),
 	})
@@ -137,7 +137,7 @@ func (m *mServer) CreateSubscription(ctx context.Context,
 	return &connect.Response[mbotpb.CreateSubscriptionResponse]{
 		Msg: &mbotpb.CreateSubscriptionResponse{
 			Message:      "subscription created successfully",
-			Slug:         req.Msg.GetSlug(),
+			CustomerId:   req.Msg.GetCustomerId(),
 			Subscription: sub,
 		},
 	}, nil

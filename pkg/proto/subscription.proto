@@ -11,14 +11,14 @@ message Subscription {
 }
 
 message CreateSubscriptionRequest {
-  string slug = 1;
+  string customer_id = 1;
   google.protobuf.Timestamp subscription_start_date = 2;
   int32 duration = 3;
 }
 
 message CreateSubscriptionResponse {
   string message = 1;
-  string slug = 2;
+  string customer_id = 2;
   Subscription subscription = 3;
 }
 
