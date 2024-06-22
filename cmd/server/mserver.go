@@ -16,6 +16,8 @@ type mServer struct {
 	db *store.Store
 }
 
+var _ mbotpbconnect.MBotServerServiceHandler = (*mServer)(nil)
+
 func (m *mServer) CreateCustomer(ctx context.Context,
 	req *connect.Request[mbotpb.CreateCustomerRequest]) (*connect.Response[mbotpb.CreateCustomerResponse], error) {
 	slug, err := m.db.CreateCustomer(ctx,
@@ -105,10 +107,11 @@ func (m *mServer) UpdateCustomer(ctx context.Context,
 
 func (m *mServer) DeleteCustomer(ctx context.Context,
 	req *connect.Request[mbotpb.DeleteCustomerRequest]) (*connect.Response[mbotpb.DeleteCustomerResponse], error) {
-	err := m.db.DeleteCustomer(ctx, req.Msg.GetSlug())
-	if err != nil {
-		return nil, err
-	}
+	// todo: implement delete customer
+	// err := m.db.DeleteCustomer(ctx, req.Msg.GetSlug())
+	// if err != nil {
+	// 	return nil, err
+	// }
 	return &connect.Response[mbotpb.DeleteCustomerResponse]{
 		Msg: &mbotpb.DeleteCustomerResponse{
 			Message: fmt.Sprintf("Customer deleted with ID: %s", req.Msg.GetSlug()),
@@ -119,7 +122,11 @@ func (m *mServer) DeleteCustomer(ctx context.Context,
 func (m *mServer) CreateSubscription(ctx context.Context,
 	req *connect.Request[mbotpb.CreateSubscriptionRequest]) (*connect.Response[mbotpb.CreateSubscriptionResponse], error) {
 	start := req.Msg.GetSubscriptionStartDate().AsTime().Format("2006-01-02")
-	id, err := m.db.CreateSubscription(ctx)
+	id, err := m.db.CreateSubscription(ctx, store.SubscriptionCreate{
+		CustomerID: req.Msg.GetSlug(),
+		StartDate:  start,
+		Duration:   int(req.Msg.GetDuration()),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +143,7 @@ func (m *mServer) CreateSubscription(ctx context.Context,
 	}, nil
 }
 
-func (m *mServer) GetSubscriptionsAll(ctx context.Context) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error) {
+func (m *mServer) GetSubscriptionsAll(ctx context.Context, req *connect.Request[mbotpb.GetSubscriptionsAllRequest]) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error) {
 	// subs, err := m.db.GetSubscriptionsAll(ctx)
 	// if err != nil {
 	// 	return nil, err
@@ -167,23 +174,23 @@ func (m *mServer) GetSubscriptionsAll(ctx context.Context) (*connect.Response[mb
 	}, nil
 }
 
-//
-// func (m *mServer) UpdateSubscription(ctx context.Context,
-// 	req *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error) {
-// 	err := m.db.UpdateSubscription(ctx,
-// 		req.Msg.GetId(),
-// 		req.Msg.GetSlug(),
-// 		req.Msg.GetSubscriptionExpiry(),
-// 	)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &connect.Response[mbotpb.UpdateSubscriptionResponse]{
-// 		Msg: &mbotpb.UpdateSubscriptionResponse{
-// 			Message: fmt.Sprintf("Subscription updated with ID: %s", req.Msg.GetId()),
-// 		},
-// 	}, nil
-// }
+func (m *mServer) UpdateSubscription(ctx context.Context,
+	req *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error) {
+	// err := m.db.UpdateSubscription(ctx,
+	// 	req.Msg.GetId(),
+	// 	req.Msg.GetSlug(),
+	// 	req.Msg.GetSubscriptionExpiry(),
+	// )
+	// if err != nil {
+	// 	return nil, err
+	// }
+	return &connect.Response[mbotpb.UpdateSubscriptionResponse]{
+		Msg: &mbotpb.UpdateSubscriptionResponse{
+			Message: fmt.Sprintf("Subscription updated with ID: %s", req.Msg.SubscriptionId),
+		},
+	}, nil
+}
+
 //
 // func (m *mServer) DeleteSubscription(ctx context.Context,
 // 	req *connect.Request[mbotpb.DeleteSubscriptionRequest]) (*connect.Response[mbotpb.DeleteSubscriptionResponse], error) {
