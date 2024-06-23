@@ -55,9 +55,9 @@ message GetSubscriptionsAllResponse {
 }
 
 message GetSubscriptionByCustomerRequest {
-  string slug = 1;
+  string customer_id = 1;
 }
 
 message GetSubscriptionByCustomerResponse {
-  GetSubscriptionResponse subscription = 1;
+  repeated Subscription subscriptions = 1;
 }

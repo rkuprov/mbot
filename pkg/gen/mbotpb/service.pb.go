@@ -26,7 +26,7 @@ var file_service_proto_rawDesc = []byte{
 	0x04, 0x6d, 0x62, 0x6f, 0x74, 0x1a, 0x0e, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x0b, 0x73, 0x74, 0x61, 0x74, 0x73, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x1a, 0x12, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0xaf, 0x05, 0x0a, 0x11, 0x4d, 0x42, 0x6f, 0x74, 0x53,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0x9f, 0x06, 0x0a, 0x11, 0x4d, 0x42, 0x6f, 0x74, 0x53,
 	0x65, 0x72, 0x76, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x4d, 0x0a, 0x0e,
 	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x12, 0x1b,
 	0x2e, 0x6d, 0x62, 0x6f, 0x74, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x75, 0x73, 0x74,
@@ -69,6 +69,13 @@ var file_service_proto_rawDesc = []byte{
 	0x65, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71,
 	0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x6d, 0x62, 0x6f, 0x74, 0x2e, 0x55, 0x70, 0x64, 0x61,
 	0x74, 0x65, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x6e, 0x0a, 0x19, 0x47, 0x65, 0x74, 0x53,
+	0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x43, 0x75, 0x73,
+	0x74, 0x6f, 0x6d, 0x65, 0x72, 0x12, 0x26, 0x2e, 0x6d, 0x62, 0x6f, 0x74, 0x2e, 0x47, 0x65, 0x74,
+	0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x43, 0x75,
+	0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e,
+	0x6d, 0x62, 0x6f, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70,
+	0x74, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x52, 0x65,
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x70, 0x0a, 0x08, 0x63, 0x6f, 0x6d, 0x2e,
 	0x6d, 0x62, 0x6f, 0x74, 0x42, 0x0c, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x50, 0x72, 0x6f,
 	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x26, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
@@ -81,22 +88,24 @@ var file_service_proto_rawDesc = []byte{
 }
 
 var file_service_proto_goTypes = []any{
-	(*CreateCustomerRequest)(nil),       // 0: mbot.CreateCustomerRequest
-	(*GetCustomerRequest)(nil),          // 1: mbot.GetCustomerRequest
-	(*GetCustomersAllRequest)(nil),      // 2: mbot.GetCustomersAllRequest
-	(*UpdateCustomerRequest)(nil),       // 3: mbot.UpdateCustomerRequest
-	(*CreateSubscriptionRequest)(nil),   // 4: mbot.CreateSubscriptionRequest
-	(*GetSubscriptionRequest)(nil),      // 5: mbot.GetSubscriptionRequest
-	(*GetSubscriptionsAllRequest)(nil),  // 6: mbot.GetSubscriptionsAllRequest
-	(*UpdateSubscriptionRequest)(nil),   // 7: mbot.UpdateSubscriptionRequest
-	(*CreateCustomerResponse)(nil),      // 8: mbot.CreateCustomerResponse
-	(*GetCustomerResponse)(nil),         // 9: mbot.GetCustomerResponse
-	(*GetCustomersAllResponse)(nil),     // 10: mbot.GetCustomersAllResponse
-	(*UpdateCustomerResponse)(nil),      // 11: mbot.UpdateCustomerResponse
-	(*CreateSubscriptionResponse)(nil),  // 12: mbot.CreateSubscriptionResponse
-	(*GetSubscriptionResponse)(nil),     // 13: mbot.GetSubscriptionResponse
-	(*GetSubscriptionsAllResponse)(nil), // 14: mbot.GetSubscriptionsAllResponse
-	(*UpdateSubscriptionResponse)(nil),  // 15: mbot.UpdateSubscriptionResponse
+	(*CreateCustomerRequest)(nil),             // 0: mbot.CreateCustomerRequest
+	(*GetCustomerRequest)(nil),                // 1: mbot.GetCustomerRequest
+	(*GetCustomersAllRequest)(nil),            // 2: mbot.GetCustomersAllRequest
+	(*UpdateCustomerRequest)(nil),             // 3: mbot.UpdateCustomerRequest
+	(*CreateSubscriptionRequest)(nil),         // 4: mbot.CreateSubscriptionRequest
+	(*GetSubscriptionRequest)(nil),            // 5: mbot.GetSubscriptionRequest
+	(*GetSubscriptionsAllRequest)(nil),        // 6: mbot.GetSubscriptionsAllRequest
+	(*UpdateSubscriptionRequest)(nil),         // 7: mbot.UpdateSubscriptionRequest
+	(*GetSubscriptionByCustomerRequest)(nil),  // 8: mbot.GetSubscriptionByCustomerRequest
+	(*CreateCustomerResponse)(nil),            // 9: mbot.CreateCustomerResponse
+	(*GetCustomerResponse)(nil),               // 10: mbot.GetCustomerResponse
+	(*GetCustomersAllResponse)(nil),           // 11: mbot.GetCustomersAllResponse
+	(*UpdateCustomerResponse)(nil),            // 12: mbot.UpdateCustomerResponse
+	(*CreateSubscriptionResponse)(nil),        // 13: mbot.CreateSubscriptionResponse
+	(*GetSubscriptionResponse)(nil),           // 14: mbot.GetSubscriptionResponse
+	(*GetSubscriptionsAllResponse)(nil),       // 15: mbot.GetSubscriptionsAllResponse
+	(*UpdateSubscriptionResponse)(nil),        // 16: mbot.UpdateSubscriptionResponse
+	(*GetSubscriptionByCustomerResponse)(nil), // 17: mbot.GetSubscriptionByCustomerResponse
 }
 var file_service_proto_depIdxs = []int32{
 	0,  // 0: mbot.MBotServerService.CreateCustomer:input_type -> mbot.CreateCustomerRequest
@@ -107,16 +116,18 @@ var file_service_proto_depIdxs = []int32{
 	5,  // 5: mbot.MBotServerService.GetSubscription:input_type -> mbot.GetSubscriptionRequest
 	6,  // 6: mbot.MBotServerService.GetSubscriptionsAll:input_type -> mbot.GetSubscriptionsAllRequest
 	7,  // 7: mbot.MBotServerService.UpdateSubscription:input_type -> mbot.UpdateSubscriptionRequest
-	8,  // 8: mbot.MBotServerService.CreateCustomer:output_type -> mbot.CreateCustomerResponse
-	9,  // 9: mbot.MBotServerService.GetCustomer:output_type -> mbot.GetCustomerResponse
-	10, // 10: mbot.MBotServerService.GetCustomersAll:output_type -> mbot.GetCustomersAllResponse
-	11, // 11: mbot.MBotServerService.UpdateCustomer:output_type -> mbot.UpdateCustomerResponse
-	12, // 12: mbot.MBotServerService.CreateSubscription:output_type -> mbot.CreateSubscriptionResponse
-	13, // 13: mbot.MBotServerService.GetSubscription:output_type -> mbot.GetSubscriptionResponse
-	14, // 14: mbot.MBotServerService.GetSubscriptionsAll:output_type -> mbot.GetSubscriptionsAllResponse
-	15, // 15: mbot.MBotServerService.UpdateSubscription:output_type -> mbot.UpdateSubscriptionResponse
-	8,  // [8:16] is the sub-list for method output_type
-	0,  // [0:8] is the sub-list for method input_type
+	8,  // 8: mbot.MBotServerService.GetSubscriptionByCustomer:input_type -> mbot.GetSubscriptionByCustomerRequest
+	9,  // 9: mbot.MBotServerService.CreateCustomer:output_type -> mbot.CreateCustomerResponse
+	10, // 10: mbot.MBotServerService.GetCustomer:output_type -> mbot.GetCustomerResponse
+	11, // 11: mbot.MBotServerService.GetCustomersAll:output_type -> mbot.GetCustomersAllResponse
+	12, // 12: mbot.MBotServerService.UpdateCustomer:output_type -> mbot.UpdateCustomerResponse
+	13, // 13: mbot.MBotServerService.CreateSubscription:output_type -> mbot.CreateSubscriptionResponse
+	14, // 14: mbot.MBotServerService.GetSubscription:output_type -> mbot.GetSubscriptionResponse
+	15, // 15: mbot.MBotServerService.GetSubscriptionsAll:output_type -> mbot.GetSubscriptionsAllResponse
+	16, // 16: mbot.MBotServerService.UpdateSubscription:output_type -> mbot.UpdateSubscriptionResponse
+	17, // 17: mbot.MBotServerService.GetSubscriptionByCustomer:output_type -> mbot.GetSubscriptionByCustomerResponse
+	9,  // [9:18] is the sub-list for method output_type
+	0,  // [0:9] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

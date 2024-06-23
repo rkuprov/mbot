@@ -66,6 +66,19 @@ func (m *MBot) GetSubscriptionsAll(ctx context.Context, req *connect.Request[mbo
 	}, nil
 }
 
+func (m *MBot) GetSubscriptionByCustomer(ctx context.Context,
+	req *connect.Request[mbotpb.GetSubscriptionByCustomerRequest]) (*connect.Response[mbotpb.GetSubscriptionByCustomerResponse], error) {
+	sub, err := m.db.GetSubscriptionByCustomer(ctx, req.Msg.GetCustomerId())
+	if err != nil {
+		return nil, err
+	}
+	return &connect.Response[mbotpb.GetSubscriptionByCustomerResponse]{
+		Msg: &mbotpb.GetSubscriptionByCustomerResponse{
+			Subscriptions: sub,
+		},
+	}, nil
+}
+
 func (m *MBot) UpdateSubscription(ctx context.Context,
 	req *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error) {
 	// err := m.db.UpdateSubscription(ctx,
