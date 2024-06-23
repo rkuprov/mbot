@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/rkuprov/mbot/cmd/server/internal/server"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 	"github.com/rkuprov/mbot/pkg/store"
 )
@@ -13,10 +14,8 @@ func main() {
 	r := http.NewServeMux()
 
 	db, cancel := store.NewClient(ctx)
-	m := &mServer{
-		db: db,
-	}
 	defer cancel()
+	m := server.NewMBot(db)
 
 	path, handler := mbotpbconnect.NewMBotServerServiceHandler(m)
 	r.Handle(path, handler)

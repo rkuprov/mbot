@@ -27,7 +27,7 @@ message GetSubscriptionRequest {
 }
 
 message GetSubscriptionResponse {
-  GetCustomerResponse customer = 1;
+  Customer customer = 1;
   Subscription subscription = 2;
 }
 
@@ -51,7 +51,7 @@ message DeleteSubscriptionResponse {
 message GetSubscriptionsAllRequest {}
 
 message GetSubscriptionsAllResponse {
-  repeated GetSubscriptionResponse subscriptions = 1;
+  repeated Subscription subscriptions = 1;
 }
 
 message GetSubscriptionByCustomerRequest {
