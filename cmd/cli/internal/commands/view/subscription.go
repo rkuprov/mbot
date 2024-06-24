@@ -11,7 +11,7 @@ import (
 )
 
 type Subscription struct {
-	ID         string `help:"The ID of the subscription to view" optional:""`
+	ID         string `arg:"" help:"The ID of the subscription to view" optional:""`
 	All        bool   `help:"View all subscriptions"`
 	CustomerID string `aliases:"c,cid,for" help:"View a subscription for a customer" optional:""`
 }
