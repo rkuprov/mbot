@@ -1,5 +1,6 @@
 package update
 
 type Cmd struct {
-	Customer Customer `cmd:"" help:"Update a customer"`
+	Customer     Customer     `cmd:"" aliases:"cust,c" help:"Update a customer"`
+	Subscription Subscription `cmd:"" aliases:"Sub,s" help:"Update a subscription"`
 }

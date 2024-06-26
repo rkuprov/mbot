@@ -47,7 +47,7 @@ func (m *MBot) GetSubscription(ctx context.Context,
 	}, nil
 }
 
-func (m *MBot) GetSubscriptionsAll(ctx context.Context, req *connect.Request[mbotpb.GetSubscriptionsAllRequest]) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error) {
+func (m *MBot) GetSubscriptionsAll(ctx context.Context, _ *connect.Request[mbotpb.GetSubscriptionsAllRequest]) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error) {
 	subs, err := m.db.GetSubscriptionsAll(ctx)
 	if err != nil {
 		return nil, err
@@ -81,17 +81,18 @@ func (m *MBot) GetSubscriptionByCustomer(ctx context.Context,
 
 func (m *MBot) UpdateSubscription(ctx context.Context,
 	req *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error) {
-	// err := m.db.UpdateSubscription(ctx,
-	// 	req.Msg.GetId(),
-	// 	req.Msg.GetSlug(),
-	// 	req.Msg.GetSubscriptionExpiry(),
-	// )
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err := m.db.UpdateSubscription(ctx, store.SubscriptionUpdate{
+		SubscriptionID: req.Msg.Id,
+		StartDate:      req.Msg.StartDate,
+		ExpirationDate: req.Msg.ExpirationDate,
+	},
+	)
+	if err != nil {
+		return nil, err
+	}
 	return &connect.Response[mbotpb.UpdateSubscriptionResponse]{
 		Msg: &mbotpb.UpdateSubscriptionResponse{
-			Message: fmt.Sprintf("Subscription updated with ID: %s", req.Msg.SubscriptionId),
+			Message: fmt.Sprintf("Subscription %s has been updated.", req.Msg.Id),
 		},
 	}, nil
 }

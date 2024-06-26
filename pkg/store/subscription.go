@@ -29,8 +29,8 @@ type SubscriptionCreate struct {
 
 type SubscriptionUpdate struct {
 	SubscriptionID string
-	StartDate      string
-	Duration       int
+	StartDate      *timestamppb.Timestamp
+	ExpirationDate *timestamppb.Timestamp
 }
 
 // CreateSubscription creates a new subscription for a customer in the Customers bucket as well as in the SubscriptionsLUT one
@@ -157,14 +157,10 @@ func (s *Store) DeleteSubscription(_ context.Context, id, subId string) error {
 	})
 }
 
-func (s *Store) UpdateSubscription(_ context.Context, in SubscriptionUpdate) error {
-	t, err := time.Parse(subscriptionFormat, in.StartDate)
-	if err != nil {
-		return fmt.Errorf("failed to parse start date: %w", err)
-	}
-	expiry := t.Add(time.Duration(in.Duration) * 24 * time.Hour)
+// UpdateSubscription will perform up update.
+func (s *Store) UpdateSubscription(ctx context.Context, in SubscriptionUpdate) error {
 	var cID string
-	err = s.db.View(func(tx *bbolt.Tx) error {
+	err := s.db.View(func(tx *bbolt.Tx) error {
 		v := tx.Bucket(subscription_customer).Get([]byte(in.SubscriptionID))
 		if v == nil {
 			return fmt.Errorf("subscription not found")
@@ -173,18 +169,65 @@ func (s *Store) UpdateSubscription(_ context.Context, in SubscriptionUpdate) err
 
 		return nil
 	})
+	if err != nil {
+		return err
+	}
+
+	sub, err := s.GetSubscription(ctx, in.SubscriptionID)
+	if err = validUpdate(sub, in); err != nil {
+		return fmt.Errorf("incoming update is invalid: %w", err)
+	}
 
 	return s.db.Update(func(tx *bbolt.Tx) error {
-		err = tx.Bucket(subscriptions).Put([]byte(in.SubscriptionID), []byte(strconv.FormatInt(expiry.Unix(), 10)))
-		if err != nil {
-			return fmt.Errorf("failed to update subscription: %w", err)
+		if in.StartDate != nil {
+			err = tx.Bucket(subscriptions).Put([]byte(in.SubscriptionID), []byte(in.StartDate.String()))
+			if err != nil {
+				return fmt.Errorf("failed to update subscription: %w", err)
+			}
+			err = tx.Bucket(customersBucket).Bucket([]byte(cID)).Bucket(subscriptions).Put([]byte(in.SubscriptionID),
+				[]byte(in.StartDate.String()))
+			if err != nil {
+				return fmt.Errorf("failed to update customer: %w", err)
+			}
 		}
-		err = tx.Bucket(customersBucket).Bucket([]byte(cID)).Bucket(subscriptions).Put([]byte(in.SubscriptionID),
-			[]byte(strconv.FormatInt(expiry.Unix(), 10)))
-		if err != nil {
-			return fmt.Errorf("failed to update customer: %w", err)
+
+		if in.ExpirationDate != nil {
+			err = tx.Bucket(subscriptions).Put([]byte(in.SubscriptionID), []byte(in.ExpirationDate.String()))
+			if err != nil {
+				return fmt.Errorf("failed to update subscription: %w", err)
+			}
+			err = tx.Bucket(customersBucket).Bucket([]byte(cID)).Bucket(subscriptions).Put([]byte(in.SubscriptionID),
+				[]byte(in.ExpirationDate.String()))
+			if err != nil {
+				return fmt.Errorf("failed to update customer: %w", err)
+			}
 		}
 
 		return nil
 	})
+}
+
+func validUpdate(sub *mbotpb.Subscription, in SubscriptionUpdate) error {
+	if in.StartDate != nil {
+		if in.StartDate.AsTime().Before(time.Now()) {
+			return fmt.Errorf("start date cannot be in the past")
+		}
+		if sub.SubscriptionStartDate.AsTime().Before(time.Now()) {
+			return fmt.Errorf("subscirption is already active")
+		}
+	}
+
+	if in.ExpirationDate != nil {
+		if in.ExpirationDate.AsTime().Before(sub.SubscriptionStartDate.AsTime()) {
+			return fmt.Errorf("expiration date cannot be before start date")
+		}
+	}
+
+	if in.StartDate != nil && in.ExpirationDate != nil {
+		if in.StartDate.AsTime().After(in.ExpirationDate.AsTime()) {
+			return fmt.Errorf("start date cannot be after expiration date")
+		}
+	}
+
+	return nil
 }
