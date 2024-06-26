@@ -12,11 +12,10 @@ import (
 
 func (m *MBot) CreateSubscription(ctx context.Context,
 	req *connect.Request[mbotpb.CreateSubscriptionRequest]) (*connect.Response[mbotpb.CreateSubscriptionResponse], error) {
-	start := req.Msg.GetSubscriptionStartDate().AsTime().Format("2006-01-02")
 	id, err := m.db.CreateSubscription(ctx, store.SubscriptionCreate{
-		CustomerID: req.Msg.GetCustomerId(),
-		StartDate:  start,
-		Duration:   int(req.Msg.GetDuration()),
+		CustomerID:     req.Msg.GetCustomerId(),
+		StartDate:      req.Msg.GetStartDate().AsTime(),
+		ExpirationDate: req.Msg.GetExpirationDate().AsTime(),
 	})
 	if err != nil {
 		return nil, err
@@ -55,8 +54,10 @@ func (m *MBot) GetSubscriptionsAll(ctx context.Context, _ *connect.Request[mbotp
 	out := make([]*mbotpb.Subscription, 0)
 	for _, s := range subs {
 		out = append(out, &mbotpb.Subscription{
-			SubscriptionId:     s.SubscriptionId,
-			SubscriptionExpiry: s.SubscriptionExpiry,
+			SubscriptionId: s.SubscriptionId,
+			CustomerId:     s.CustomerId,
+			StartDate:      s.StartDate,
+			ExpirationDate: s.ExpirationDate,
 		})
 	}
 	return &connect.Response[mbotpb.GetSubscriptionsAllResponse]{

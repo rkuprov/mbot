@@ -2,88 +2,31 @@ package store
 
 import (
 	"context"
-	"log"
-	"time"
+	"fmt"
 
-	"go.etcd.io/bbolt"
-)
+	_ "github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 
-/*
-CUSTOMERS (id -> CUSTOMER)
-	|_CUSTOMER --
-	   |_META
-			|_id -> string
-			|_name -> string
-			|_email -> string
-			|_contact -> string
-        |_SUBSCRIPTIONS
-			|_SUBSCRIPTION
-					|_id -> string
-                        JSON
-						|_start_date -> time
-						|_duration -> int
-			            |_info -> string
-        |_Stats
-			|_TBD
-
-DELETED (slug -> CUSTOMER)
-*/
-
-var (
-	// id -> CUSTOMER
-	customersBucket = []byte("customers")
-	// id -> CUSTOMER
-	customersDeleteBucket = []byte("customers-delete")
-
-	subscriptions = []byte("subscriptions")
-	// CUSTOMER -> "customer", "subscriptions", "stats"
-	customerData = []byte("customer")
+	"github.com/rkuprov/mbot/pkg/cfg"
 )
 
 type Store struct {
-	db *bbolt.DB
+	pg *pgxpool.Pool
 }
 
-func NewClient(ctx context.Context) (*Store, func() error) {
-	c := &Store{}
-	db, err := bbolt.Open("my.db", 0600, &bbolt.Options{Timeout: 1 * time.Second})
+func New(pCfg cfg.Postgres) (*Store, error) {
+	psql, err := pgxpool.New(context.Background(), fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=%s pool_max_conns=%s",
+		pCfg.User,
+		pCfg.Password,
+		pCfg.Host,
+		pCfg.Port,
+		pCfg.DBName,
+		pCfg.SSLMode,
+		pCfg.PoolMaxConns))
 	if err != nil {
-		log.Fatal("failed to open database: ", err)
-	}
-	c.db = db
-	if err = initBucket(c); err != nil {
-		log.Fatal("failed to initialize bucket: ", err)
-	}
-	return c, db.Close
-}
-
-func NewWithClient(_ context.Context, db *bbolt.DB) (*Store, error) {
-	c := &Store{db: db}
-	if err := initBucket(c); err != nil {
 		return nil, err
 	}
-	return c, nil
-}
-
-func initBucket(c *Store) error {
-	return c.db.Update(func(tx *bbolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists(customersBucket)
-		if err != nil {
-			return err
-		}
-		_, err = tx.CreateBucketIfNotExists(subscriptions)
-		if err != nil {
-			return err
-		}
-		_, err = tx.CreateBucketIfNotExists(subscription_customer)
-		if err != nil {
-			return err
-		}
-		_, err = tx.CreateBucketIfNotExists(customersDeleteBucket)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
+	return &Store{
+		pg: psql,
+	}, nil
 }
