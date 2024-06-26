@@ -20,9 +20,9 @@ type Subscription struct {
 
 func (s *Subscription) Run(ctx context.Context, client mbotpbconnect.MBotServerServiceClient) error {
 	resp, err := client.CreateSubscription(ctx, &connect.Request[mbotpb.CreateSubscriptionRequest]{Msg: &mbotpb.CreateSubscriptionRequest{
-		CustomerId:            s.ID,
-		SubscriptionStartDate: timestamppb.New(s.StartDate),
-		Duration:              int32(s.Duration),
+		CustomerId:     s.ID,
+		StartDate:      timestamppb.New(s.StartDate),
+		ExpirationDate: timestamppb.New(s.StartDate.AddDate(0, 0, s.Duration)),
 	},
 	})
 	if err != nil {

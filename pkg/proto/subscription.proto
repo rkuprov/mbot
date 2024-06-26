@@ -7,14 +7,15 @@ import "customer.proto";
 
 message Subscription {
   string subscription_id = 1;
-  google.protobuf.Timestamp subscription_start_date = 2;
-  google.protobuf.Timestamp subscription_expiry = 3;
+  string customer_id = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp expiration_date = 4;
 }
 
 message CreateSubscriptionRequest {
   string customer_id = 1;
-  google.protobuf.Timestamp subscription_start_date = 2;
-  int32 duration = 3;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp expiration_date = 3;
 }
 
 message CreateSubscriptionResponse {
