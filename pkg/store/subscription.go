@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -33,14 +34,14 @@ func (s *Store) CreateSubscription(ctx context.Context, in SubscriptionCreate) (
 	var id string
 	err := s.pg.QueryRow(ctx, `INSERT INTO subscriptions (
 	customer_id,
-	token,
+	id,
 	start_date,
-	end_date
+	expiration_date
 	) VALUES ($1, $2, $3, $4) RETURNING id`,
 		in.CustomerID,
 		uuid.New().String(),
 		in.StartDate,
-		in.StartDate,
+		in.ExpirationDate,
 	).Scan(&id)
 
 	if err != nil {
@@ -52,40 +53,53 @@ func (s *Store) CreateSubscription(ctx context.Context, in SubscriptionCreate) (
 
 func (s *Store) GetSubscription(ctx context.Context, id string) (*mbotpb.Subscription, error) {
 	var sub mbotpb.Subscription
+	var startDate time.Time
+	var expirationDate time.Time
 	err := s.pg.QueryRow(ctx, `
    		SELECT
    			id,
    			customer_id,
    			start_date,	
-   			end_date	
+   			expiration_date	
    		FROM subscriptions
    		WHERE id = $1
    `, id).Scan(
 		&sub.SubscriptionId,
-		&sub.StartDate,
-		&sub.ExpirationDate,
+		&sub.CustomerId,
+		&startDate,
+		&expirationDate,
 	)
 	if err != nil {
 		return nil, err
 	}
+	sub.StartDate = timestamppb.New(startDate)
+	sub.ExpirationDate = timestamppb.New(expirationDate)
 
 	return &sub, nil
 }
 
 func (s *Store) GetSubscriptionsAll(ctx context.Context) ([]*mbotpb.Subscription, error) {
 	var out []*mbotpb.Subscription
-	rows, err := s.pg.Query(ctx, `SELECT id, customer_id, start_date, end_date FROM subscriptions`)
+	rows, err := s.pg.Query(ctx, `SELECT id, customer_id, start_date, expiration_date FROM subscriptions`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var sub mbotpb.Subscription
-		if err = rows.Scan(&sub.SubscriptionId, &sub.StartDate, &sub.ExpirationDate); err != nil {
+		var id string
+		var customerID int
+		var startDate time.Time
+		var expirationDate time.Time
+		if err = rows.Scan(&id, &customerID, &startDate, &expirationDate); err != nil {
 			return nil, err
 		}
-		out = append(out, &sub)
+		out = append(out, &mbotpb.Subscription{
+			SubscriptionId: id,
+			CustomerId:     strconv.Itoa(customerID),
+			StartDate:      timestamppb.New(startDate),
+			ExpirationDate: timestamppb.New(expirationDate),
+		})
 	}
 
 	return out, nil
@@ -93,7 +107,7 @@ func (s *Store) GetSubscriptionsAll(ctx context.Context) ([]*mbotpb.Subscription
 
 func (s *Store) GetSubscriptionByCustomer(ctx context.Context, customerID string) ([]*mbotpb.Subscription, error) {
 	var out []*mbotpb.Subscription
-	rows, err := s.pg.Query(ctx, `SELECT id, start_date, end_date FROM subscriptions WHERE customer_id = $1`, customerID)
+	rows, err := s.pg.Query(ctx, `SELECT id, start_date, expiration_date FROM subscriptions WHERE customer_id = $1`, customerID)
 	if err != nil {
 		return nil, err
 	}
@@ -101,9 +115,13 @@ func (s *Store) GetSubscriptionByCustomer(ctx context.Context, customerID string
 
 	for rows.Next() {
 		var sub mbotpb.Subscription
-		if err = rows.Scan(&sub.SubscriptionId, &sub.StartDate, &sub.ExpirationDate); err != nil {
+		var startDate time.Time
+		var expirationDate time.Time
+		if err = rows.Scan(&sub.SubscriptionId, &startDate, &expirationDate); err != nil {
 			return nil, err
 		}
+		sub.StartDate = timestamppb.New(startDate)
+		sub.ExpirationDate = timestamppb.New(expirationDate)
 		out = append(out, &sub)
 	}
 
@@ -139,7 +157,7 @@ func (s *Store) UpdateSubscription(ctx context.Context, in SubscriptionUpdate) e
 		UPDATE subscriptions
 		SET
 			start_date = $1,
-			end_date = $2
+			expiration_date = $2
 		WHERE id = $3
 	`, in.StartDate, in.ExpirationDate, in.SubscriptionID)
 	if err != nil {

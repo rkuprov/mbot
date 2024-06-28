@@ -15,7 +15,7 @@ type Store struct {
 }
 
 func New(pCfg cfg.Postgres) (*Store, error) {
-	psql, err := pgxpool.New(context.Background(), fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=%s pool_max_conns=%s",
+	psql, err := pgxpool.New(context.Background(), fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=%s pool_max_conns=%d",
 		pCfg.User,
 		pCfg.Password,
 		pCfg.Host,

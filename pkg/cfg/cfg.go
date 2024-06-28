@@ -13,12 +13,12 @@ type Cfg struct {
 
 type Postgres struct {
 	Host         string `json:"host"`
-	Port         string `json:"port"`
+	Port         int    `json:"port"`
 	User         string `json:"user"`
 	Password     string `json:"password"`
 	DBName       string `json:"dbname"`
 	SSLMode      string `json:"sslmode"`
-	PoolMaxConns string `json:"pool_max_conns"`
+	PoolMaxConns int    `json:"pool_max_conns"`
 }
 
 func (c *Cfg) Load(path string) error {
@@ -44,7 +44,7 @@ func setupEnv(c *Cfg) {
 	}
 	// GOOSE_DRIVER=DRIVER
 	err = os.Setenv("GOOSE_DBSTRING", fmt.Sprintf(
-		"user=%s password=%s host=%s port=%s dbname=%s sslmode=%s pool_max_conns=%s",
+		"user=%s password=%s host=%s port=%d dbname=%s sslmode=%s pool_max_conns=%d",
 		c.Postgres.User,
 		c.Postgres.Password,
 		c.Postgres.Host,
@@ -57,5 +57,5 @@ func setupEnv(c *Cfg) {
 		panic(err)
 	}
 	// GOOSE_MIGRATION_DIR=MIGRATION_DIR
-	err = os.Setenv("GOOSE_MIGRATION_DIR", "migrations")
+	err = os.Setenv("GOOSE_MIGRATION_DIR", "../../migrations")
 }

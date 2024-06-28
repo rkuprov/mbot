@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 
@@ -13,7 +14,7 @@ import (
 func main() {
 	r := http.NewServeMux()
 	configs := new(cfg.Cfg)
-	err := configs.Load(filepath.Clean(filepath.Join("deployment", "config.yaml")))
+	err := configs.Load(filepath.Join("..", "..", "deployment", "config.json"))
 	if err != nil {
 		panic(err)
 	}
@@ -26,6 +27,7 @@ func main() {
 	path, handler := mbotpbconnect.NewMBotServerServiceHandler(m)
 	r.Handle(path, handler)
 
+	fmt.Println("Starting MBOT service")
 	err = http.ListenAndServe("localhost:8080", r)
 	if err != nil {
 		panic(err)
