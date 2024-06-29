@@ -2,11 +2,13 @@ package store
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
@@ -14,6 +16,13 @@ import (
 
 const (
 	subscriptionFormat = "2006-01-02"
+)
+
+var (
+	// ErrSubscriptionNotFound is returned when a subscription is not found.
+	ErrSubscriptionNotFound  = fmt.Errorf("subscription not found")
+	ErrSubscriptionExpired   = fmt.Errorf("subscription expired")
+	ErrSubscriptionNotActive = fmt.Errorf("subscription not active")
 )
 
 type SubscriptionCreate struct {
@@ -187,6 +196,36 @@ func validUpdate(sub *mbotpb.Subscription, in SubscriptionUpdate) error {
 		if in.StartDate.AsTime().After(in.ExpirationDate.AsTime()) {
 			return fmt.Errorf("start date cannot be after expiration date")
 		}
+	}
+
+	return nil
+}
+
+func (s *Store) ConfirmSubscription(ctx context.Context, token string) error {
+	var startDate time.Time
+	var expirationDate time.Time
+	var id string
+	err := s.pg.QueryRow(ctx, `
+	SELECT 
+	id,
+	start_date,
+	expiration_date
+	FROM subscriptions 
+	WHERE id = $1 
+	`,
+		token,
+	).Scan(&id, &startDate, &expirationDate)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return ErrSubscriptionNotFound
+	}
+	if err != nil {
+		return err
+	}
+	if time.Now().Before(startDate) {
+		return ErrSubscriptionNotActive
+	}
+	if time.Now().After(expirationDate) {
+		return ErrSubscriptionExpired
 	}
 
 	return nil
