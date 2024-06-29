@@ -1,106 +1,72 @@
 package store_test
 
-//
-// import (
-// 	"context"
-// 	"testing"
-//
-// 	"github.com/stretchr/testify/assert"
-//
-// 	"github.com/rkuprov/mbot/pkg/store"
-// )
-//
-// func TestCreateSubscription(t *testing.T) {
-// 	ctx := context.Background()
-// 	c, cleanUp := NewTestClient(ctx)
-// 	defer cleanUp()
-// 	cid, err := c.CreateCustomer(ctx, store.CustomerCreate{
-// 		Name:    "john doe",
-// 		Email:   "jd@gmail.com",
-// 		Contact: "it's a me! mario",
-// 	})
-//
-// 	id, err := c.CreateSubscription(ctx, store.SubscriptionCreate{
-// 		CustomerID: cid,
-// 		StartDate:  "2021-01-01",
-// 		Duration:   30,
-// 	})
-// 	assert.NoError(t, err)
-// 	assert.NotEmpty(t, id)
-//
-// 	sub, err := c.GetSubscription(ctx, id)
-// 	assert.NoError(t, err)
-// 	assert.NotEmpty(t, sub)
-// 	assert.Equal(t, "2021-01-31", sub.GetSubscriptionExpiry().AsTime().Format("2006-01-02"))
-// 	assert.Equal(t, id, sub.GetSubscriptionId())
-// }
-//
-// func TestGetSubscriptionAll(t *testing.T) {
-// 	ctx := context.Background()
-// 	c, cleanUp := NewTestClient(ctx)
-// 	defer cleanUp()
-// 	cid, err := c.CreateCustomer(ctx, store.CustomerCreate{
-// 		Name:    "john doe",
-// 		Email:   "jd@gmail.com",
-// 		Contact: "it's a me! mario",
-// 	})
-//
-// 	id, err := c.CreateSubscription(ctx, store.SubscriptionCreate{
-// 		CustomerID: cid,
-// 		StartDate:  "2021-01-01",
-// 		Duration:   30,
-// 	})
-// 	assert.NoError(t, err)
-// 	assert.NotEmpty(t, id)
-//
-// 	id2, err := c.CreateSubscription(ctx, store.SubscriptionCreate{
-// 		CustomerID: cid,
-// 		StartDate:  "2021-04-01",
-// 		Duration:   120,
-// 	})
-// 	assert.NoError(t, err)
-// 	assert.NotEmpty(t, id2)
-//
-// 	sub, err := c.GetSubscriptionsAll(ctx)
-// 	assert.NoError(t, err)
-// 	assert.Len(t, sub, 2)
-// 	assert.Equal(t, "2021-01-31", sub[0].GetSubscriptionExpiry().AsTime().Format("2006-01-02"))
-// 	assert.Equal(t, id, sub[0].GetSubscriptionId())
-// 	assert.Equal(t, "2021-07-30", sub[1].GetSubscriptionExpiry().AsTime().Format("2006-01-02"))
-// 	assert.Equal(t, id2, sub[1].GetSubscriptionId())
-// }
-//
-// func TestGetSubscriptionByCustomer(t *testing.T) {
-// 	ctx := context.Background()
-// 	c, cleanUp := NewTestClient(ctx)
-// 	defer cleanUp()
-// 	cid, err := c.CreateCustomer(ctx, store.CustomerCreate{
-// 		Name:    "john doe",
-// 		Email:   "jd@gmail.com",
-// 		Contact: "it's a me! mario",
-// 	})
-//
-// 	id, err := c.CreateSubscription(ctx, store.SubscriptionCreate{
-// 		CustomerID: cid,
-// 		StartDate:  "2021-01-01",
-// 		Duration:   30,
-// 	})
-// 	assert.NoError(t, err)
-// 	assert.NotEmpty(t, id)
-//
-// 	id2, err := c.CreateSubscription(ctx, store.SubscriptionCreate{
-// 		CustomerID: cid,
-// 		StartDate:  "2021-04-01",
-// 		Duration:   120,
-// 	})
-// 	assert.NoError(t, err)
-// 	assert.NotEmpty(t, id2)
-//
-// 	sub, err := c.GetSubscriptionByCustomer(ctx, cid)
-// 	assert.NoError(t, err)
-// 	assert.Len(t, sub, 2)
-// 	assert.Equal(t, "2021-01-31", sub[0].GetSubscriptionExpiry().AsTime().Format("2006-01-02"))
-// 	assert.Equal(t, id, sub[0].GetSubscriptionId())
-// 	assert.Equal(t, "2021-07-30", sub[1].GetSubscriptionExpiry().AsTime().Format("2006-01-02"))
-// 	assert.Equal(t, id2, sub[1].GetSubscriptionId())
-// }
+import (
+	"context"
+	"fmt"
+	"path/filepath"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/rkuprov/mbot/pkg/cfg"
+	"github.com/rkuprov/mbot/pkg/store"
+)
+
+func TestStore_CreateSubscription(t *testing.T) {
+	ctx := context.Background()
+	configs := new(cfg.Cfg)
+	err := configs.Load(filepath.Join("..", "..", "deployment", "config.json"))
+	assert.NoError(t, err)
+	client, err := store.New(configs.Postgres)
+	assert.NoError(t, err)
+
+	start := time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)
+	sub1 := store.SubscriptionCreate{
+		CustomerID:     "1",
+		StartDate:      start,
+		ExpirationDate: start.AddDate(1, 0, 0),
+	}
+	sub2 := store.SubscriptionCreate{
+		CustomerID:     "1",
+		StartDate:      start,
+		ExpirationDate: start.AddDate(1, 0, 0),
+	}
+
+	id1, err := client.CreateSubscription(ctx, sub1)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, id1)
+	id2, err := client.CreateSubscription(ctx, sub2)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, id2)
+
+	customer, err := client.GetCustomer(ctx, "1")
+	assert.NoError(t, err)
+	fmt.Println(customer.String())
+}
+
+func TestStore_GetSubscription(t *testing.T) {
+	ctx := context.Background()
+	configs := new(cfg.Cfg)
+	err := configs.Load(filepath.Join("..", "..", "deployment", "config.json"))
+	assert.NoError(t, err)
+	client, err := store.New(configs.Postgres)
+	assert.NoError(t, err)
+
+	out, err := client.GetSubscription(ctx, "f57bfb0c-3c41-4833-b468-012f72eed020")
+	assert.NoError(t, err)
+	fmt.Println(out.String())
+
+	outAll, err := client.GetSubscriptionsAll(ctx)
+	assert.NoError(t, err)
+	for _, sub := range outAll {
+		fmt.Println(sub.String())
+	}
+
+	fmt.Println("By customer:")
+	outC, err := client.GetSubscriptionByCustomer(ctx, "1")
+	assert.NoError(t, err)
+	for _, sub := range outC {
+		fmt.Println(sub.String())
+	}
+}

@@ -3,6 +3,8 @@ package store
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5/pgtype"
+
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 )
 
@@ -35,26 +37,34 @@ func (s *Store) CreateCustomer(ctx context.Context, in CustomerCreate) (string, 
 
 func (s *Store) GetCustomer(ctx context.Context, id string) (mbotpb.Customer, error) {
 	var c mbotpb.Customer
-
+	var subs pgtype.Array[*string]
 	err := s.pg.QueryRow(ctx, `
 		SELECT 
-			customers.id, 
-			name, 
-			email, 
-			contact,
-			subscriptions.id as subscription_id
-	from customers 
-	join subscriptions on subscriptions.customer_id = customers.id 
-	and customers.id = $1
+	   customers.id,
+       name,
+       email,
+       contact,
+       ARRAY_AGG(subscriptions.id) as subscription_ids
+from customers
+         left join subscriptions on subscriptions.customer_id = customers.id
+where customers.id = $1
+GROUP BY customers.id;
 	`, id).Scan(
 		&c.Id,
 		&c.Name,
 		&c.Email,
 		&c.Contact,
-		&c.SubscriptionIds,
+		&subs,
 	)
 	if err != nil {
 		return mbotpb.Customer{}, err
+	}
+
+	for _, sub := range subs.Elements {
+		if sub == nil {
+			continue
+		}
+		c.SubscriptionIds = append(c.SubscriptionIds, *sub)
 	}
 
 	return c, nil
@@ -65,11 +75,16 @@ func (s *Store) GetCustomersAll(ctx context.Context) ([]mbotpb.Customer, error) 
 
 	rows, err := s.pg.Query(ctx, `
 	SELECT
-		id,
+		customers.id,
 		name,
 		email,
-		contact
-	FROM customers`)
+		contact,
+		ARRAY_AGG(subscriptions.id) as subscription_ids
+	FROM customers
+	LEFT JOIN subscriptions ON subscriptions.customer_id = customers.id
+	GROUP BY customers.id
+	ORDER BY customers.id;
+	`)
 	if err != nil {
 		return nil, err
 	}
@@ -77,14 +92,23 @@ func (s *Store) GetCustomersAll(ctx context.Context) ([]mbotpb.Customer, error) 
 
 	for rows.Next() {
 		var c mbotpb.Customer
+		var subs pgtype.Array[*string]
 		if err := rows.Scan(
 			&c.Id,
 			&c.Name,
 			&c.Email,
 			&c.Contact,
+			&subs,
 		); err != nil {
 			return nil, err
 		}
+		for _, sub := range subs.Elements {
+			if sub == nil {
+				continue
+			}
+			c.SubscriptionIds = append(c.SubscriptionIds, *sub)
+		}
+
 		customers = append(customers, c)
 	}
 
