@@ -21,7 +21,9 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
+          POSTGRES_USER: admin
           POSTGRES_PASSWORD: admin_password
+          POSTGRES_DB: mbotdb
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -33,7 +35,8 @@ jobs:
           - 5432:5432
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -46,6 +49,6 @@ jobs:
       - name: install goose
         run: go install github.com/pressly/goose/v3/cmd/goose@latest
       - name: Run Migrations
-        run: goose -dir migrations postgres "user=postgres password=${{ secrets.POSTGRES_PASSWORD }} dbname=postgres sslmode=disable" up
+        run: goose -dir migrations postgres "user=admin password=admin_password dbname=mbotdb sslmode=disable" up
 #      - name: Test
 #        run: go test -v ./...
