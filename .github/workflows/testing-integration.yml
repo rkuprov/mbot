@@ -23,7 +23,7 @@ env:
 
 
 jobs:
-  setup-db:
+  testing-deploy-and-test:
     runs-on: ubuntu-latest
     environment: testing
     services:
