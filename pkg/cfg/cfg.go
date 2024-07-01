@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 )
 
 type Cfg struct {
@@ -28,14 +27,14 @@ func Load() (*Cfg, error) {
 		path := "../../deployment/config.json"
 		return getCFGFromPath(path)
 	case "testing":
-		port, err := strconv.Atoi(os.Getenv("POSTGRES_PORT"))
-		if err != nil {
-			return nil, err
-		}
+		// port, err := strconv.Atoi(os.Getenv("POSTGRES_PORT"))
+		// if err != nil {
+		// 	return nil, err
+		// }
 		return &Cfg{
 			Postgres: Postgres{
 				Host:         os.Getenv("POSTGRES_HOST"),
-				Port:         port,
+				Port:         5432,
 				User:         os.Getenv("POSTGRES_USER"),
 				Password:     os.Getenv("POSTGRES_PASSWORD"),
 				DBName:       os.Getenv("POSTGRES_DBNAME"),
