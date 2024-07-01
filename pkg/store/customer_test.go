@@ -2,23 +2,19 @@ package store_test
 
 import (
 	"context"
-	"fmt"
-	"path/filepath"
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/rkuprov/mbot/pkg/cfg"
 	"github.com/rkuprov/mbot/pkg/store"
 )
 
-func TestStore_CreateCustomer(t *testing.T) {
-	configs := new(cfg.Cfg)
-	err := configs.Load(filepath.Join("..", "..", "deployment", "config.json"))
-	assert.NoError(t, err)
-	client, err := store.New(configs.Postgres)
-	assert.NoError(t, err)
+func TestStore_CreateGetCustomer(t *testing.T) {
+	client, cleanup, err := store.NewTestStore()
+	require.NoError(t, err)
+	defer cleanup()
 
 	c := store.CustomerCreate{
 		Name:    gofakeit.Name(),
@@ -29,23 +25,9 @@ func TestStore_CreateCustomer(t *testing.T) {
 	id, err := client.CreateCustomer(context.Background(), c)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, id)
-	// out, err := client.GetCustomer(context.Background(), id)
-	// assert.NoError(t, err)
-	// assert.Equal(t, c.Name, out.Name)
-	// assert.Equal(t, c.Email, out.Email)
-	// assert.Equal(t, c.Contact, out.Contact)
-}
-
-func TestStore_GetCustomer(t *testing.T) {
-	configs := new(cfg.Cfg)
-	err := configs.Load(filepath.Join("..", "..", "deployment", "config.json"))
+	out, err := client.GetCustomer(context.Background(), id)
 	assert.NoError(t, err)
-	client, err := store.New(configs.Postgres)
-	assert.NoError(t, err)
-
-	out, err := client.GetCustomersAll(context.Background())
-	assert.NoError(t, err)
-	for _, cu := range out {
-		fmt.Println(cu.String())
-	}
+	assert.Equal(t, c.Name, out.Name)
+	assert.Equal(t, c.Email, out.Email)
+	assert.Equal(t, c.Contact, out.Contact)
 }

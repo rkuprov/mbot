@@ -30,3 +30,22 @@ func New(pCfg cfg.Postgres) (*Store, error) {
 		pg: psql,
 	}, nil
 }
+
+func NewTestStore() (*Store, func(), error) {
+	configs, err := cfg.Load()
+	if err != nil {
+		return nil, nil, err
+	}
+	client, err := New(configs.Postgres)
+	if err != nil {
+		return nil, nil, err
+	}
+	return client, func() {
+		cleanup(client.pg)
+	}, nil
+}
+
+func cleanup(psql *pgxpool.Pool) {
+	_, _ = psql.Exec(context.Background(), "TRUNCATE TABLE customers CASCADE")
+	psql.Close()
+}

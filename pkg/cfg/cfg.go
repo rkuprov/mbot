@@ -21,41 +21,47 @@ type Postgres struct {
 	PoolMaxConns int    `json:"pool_max_conns"`
 }
 
-func (c *Cfg) Load(path string) error {
+func Load() (*Cfg, error) {
+	switch os.Getenv("MBOT_ENV") {
+	case "local":
+		path := "../../deployment/config.json"
+		return getCFGFromPath(path)
+	case "testing":
+		// port, err := strconv.Atoi(os.Getenv("POSTGRES_PORT"))
+		// if err != nil {
+		// 	return nil, err
+		// }
+		return &Cfg{
+			Postgres: Postgres{
+				Host:         os.Getenv("POSTGRES_HOST"),
+				Port:         5432,
+				User:         os.Getenv("POSTGRES_USER"),
+				Password:     os.Getenv("POSTGRES_PASSWORD"),
+				DBName:       os.Getenv("POSTGRES_DBNAME"),
+				SSLMode:      "disable",
+				PoolMaxConns: 10,
+			},
+		}, nil
+	}
+
+	return nil, fmt.Errorf("unknown environment")
+}
+
+func getCFGFromPath(path string) (*Cfg, error) {
+	cfg := new(Cfg)
 	f, err := os.Open(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer f.Close()
 	bts, err := io.ReadAll(f)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	setupEnv(c)
-
-	return json.Unmarshal(bts, c)
-}
-
-func setupEnv(c *Cfg) {
-	err := os.Setenv("GOOSE_DRIVER", "postgres")
+	err = json.Unmarshal(bts, cfg)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	// GOOSE_DRIVER=DRIVER
-	err = os.Setenv("GOOSE_DBSTRING", fmt.Sprintf(
-		"user=%s password=%s host=%s port=%d dbname=%s sslmode=%s pool_max_conns=%d",
-		c.Postgres.User,
-		c.Postgres.Password,
-		c.Postgres.Host,
-		c.Postgres.Port,
-		c.Postgres.DBName,
-		c.Postgres.SSLMode,
-		c.Postgres.PoolMaxConns,
-	))
-	if err != nil {
-		panic(err)
-	}
-	// GOOSE_MIGRATION_DIR=MIGRATION_DIR
-	err = os.Setenv("GOOSE_MIGRATION_DIR", "../../migrations")
+	return cfg, nil
 }
