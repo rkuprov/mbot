@@ -2,7 +2,6 @@ package store_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -13,7 +12,7 @@ import (
 	"github.com/rkuprov/mbot/pkg/store"
 )
 
-func TestStore_CreateSubscription(t *testing.T) {
+func TestStore_CreateGetSubscription(t *testing.T) {
 	ctx := context.Background()
 	configs, err := cfg.Load()
 	require.NoError(t, err)
@@ -41,30 +40,17 @@ func TestStore_CreateSubscription(t *testing.T) {
 
 	customer, err := client.GetCustomer(ctx, "1")
 	assert.NoError(t, err)
-	fmt.Println(customer.String())
-}
+	assert.Len(t, customer.SubscriptionIds, 2)
 
-func TestStore_GetSubscription(t *testing.T) {
-	ctx := context.Background()
-	configs, err := cfg.Load()
-	require.NoError(t, err)
-	client, err := store.New(configs.Postgres)
+	out1, err := client.GetSubscription(ctx, id1)
 	assert.NoError(t, err)
+	assert.Equal(t, sub1.CustomerID, out1.CustomerId)
+	assert.Equal(t, sub1.StartDate, out1.StartDate)
+	assert.Equal(t, sub1.ExpirationDate, out1.ExpirationDate)
 
-	out, err := client.GetSubscription(ctx, "f57bfb0c-3c41-4833-b468-012f72eed020")
+	out2, err := client.GetSubscription(ctx, id2)
 	assert.NoError(t, err)
-	fmt.Println(out.String())
-
-	outAll, err := client.GetSubscriptionsAll(ctx)
-	assert.NoError(t, err)
-	for _, sub := range outAll {
-		fmt.Println(sub.String())
-	}
-
-	fmt.Println("By customer:")
-	outC, err := client.GetSubscriptionByCustomer(ctx, "1")
-	assert.NoError(t, err)
-	for _, sub := range outC {
-		fmt.Println(sub.String())
-	}
+	assert.Equal(t, sub2.CustomerID, out2.CustomerId)
+	assert.Equal(t, sub2.StartDate, out2.StartDate)
+	assert.Equal(t, sub2.ExpirationDate, out2.ExpirationDate)
 }
