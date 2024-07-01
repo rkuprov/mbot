@@ -23,23 +23,9 @@ env:
 
 
 jobs:
-  setup-env:
-    runs-on: ubuntu-latest
-    environment: testing
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21'
-
   setup-db:
     runs-on: ubuntu-latest
-    needs: setup-env
     environment: testing
-    # Service containers to run with `container-job`
     services:
       # Label used to access the service container
       postgres:
@@ -61,26 +47,29 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     steps:
-       - name: install goose
-         run: go install github.com/pressly/goose/v3/cmd/goose@latest
-
-       - name: Run Migrations
-         run: goose up
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      - name: install goose
+        run: go install github.com/pressly/goose/v3/cmd/goose@latest
+      - name: Run Migrations
+        run: goose up
 
 
   build:
     runs-on: ubuntu-latest
-    needs: setup-env
+    needs: setup-db
     environment: testing
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
       - name: Build
         run: go build -v ./...
 
   test:
     runs-on: ubuntu-latest
-    needs: [setup-env, setup-db, build]
+    needs: [ setup-db, build ]
     environment: testing
     steps:
       - name: run tests
