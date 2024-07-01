@@ -45,12 +45,12 @@ func TestStore_CreateGetSubscription(t *testing.T) {
 	out1, err := client.GetSubscription(ctx, id1)
 	assert.NoError(t, err)
 	assert.Equal(t, sub1.CustomerID, out1.CustomerId)
-	assert.Equal(t, sub1.StartDate, out1.StartDate)
-	assert.Equal(t, sub1.ExpirationDate, out1.ExpirationDate)
+	assert.Equal(t, sub1.StartDate, out1.StartDate.AsTime())
+	assert.Equal(t, sub1.ExpirationDate, out1.ExpirationDate.AsTime())
 
 	out2, err := client.GetSubscription(ctx, id2)
 	assert.NoError(t, err)
 	assert.Equal(t, sub2.CustomerID, out2.CustomerId)
-	assert.Equal(t, sub2.StartDate, out2.StartDate)
-	assert.Equal(t, sub2.ExpirationDate, out2.ExpirationDate)
+	assert.Equal(t, sub2.StartDate, out2.StartDate.AsTime())
+	assert.Equal(t, sub2.ExpirationDate, out2.ExpirationDate.AsTime())
 }
