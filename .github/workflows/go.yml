@@ -9,16 +9,18 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  GOOSE_DBSTRING: ${{ vars.GOOSE_DBSTRING }}
+  GOOSE_DRIVER: ${{ vars.GOOSE_DRIVER }}
+  GOOSE_MIGRATION_DIR: ${{ vars.GOOSE_MIGRATION_DIR }}
+  GOOSE_ENV: ${{ vars.GOOSE_ENV }}
+  MBOT_ENV: testing
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin_password
-      POSTGRES_DB: mbotdb
-      POSTGRES_PORT: 5432
-      POSTGRES_HOST: localhost
+    environment: testing
     # Service containers to run with `container-job`
     services:
       # Label used to access the service container
@@ -26,7 +28,7 @@ jobs:
         # Docker Hub image
         image: postgres
         env:
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -51,12 +53,10 @@ jobs:
 
       - name: install goose
         run: go install github.com/pressly/goose/v3/cmd/goose@latest
-      - name : setup goose
-        run : GOOSE_DBSTRING='user=$POSTGRES_USER password=$POSTGRES_PASSWORD host=$POSTGRES_HOST port=$POSTGRES_PORT dbname=$POSTGRES_DB sslmode=disable'
       - name: check goose
         run: echo $GOOSE_DBSTRING
       - name: Run Migrations
-        run: goose -dir migrations postgres
+        run: goose up
 
       - name: run tests
-        run: MBOT_ENV=testing go test -v ./...
+        run: go test -v ./...
