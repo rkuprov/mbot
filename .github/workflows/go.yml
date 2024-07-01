@@ -51,9 +51,10 @@ jobs:
 
       - name: install goose
         run: go install github.com/pressly/goose/v3/cmd/goose@latest
-
+      - name : setup goose
+        run : GOOSE_DBSTRING='user=$POSTGRES_USER password=$POSTGRES_PASSWORD host=$POSTGRES_HOST port=$POSTGRES_PORT dbname=$POSTGRES_DB sslmode=disable'
       - name: Run Migrations
-        run: goose -dir migrations postgres "user=admin password=admin_password host=localhost port=5432 dbname=mbotdb sslmode=disable" up
+        run: goose -dir migrations postgres
 
       - name: run tests
         run: MBOT_ENV=testing go test -v ./...
