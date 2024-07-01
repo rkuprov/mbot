@@ -3,7 +3,6 @@ package store_test
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -15,8 +14,7 @@ import (
 
 func TestStore_CreateSubscription(t *testing.T) {
 	ctx := context.Background()
-	configs := new(cfg.Cfg)
-	err := configs.Load(filepath.Join("..", "..", "deployment", "config.json"))
+	configs, err := cfg.Load()
 	assert.NoError(t, err)
 	client, err := store.New(configs.Postgres)
 	assert.NoError(t, err)
@@ -47,8 +45,7 @@ func TestStore_CreateSubscription(t *testing.T) {
 
 func TestStore_GetSubscription(t *testing.T) {
 	ctx := context.Background()
-	configs := new(cfg.Cfg)
-	err := configs.Load(filepath.Join("..", "..", "deployment", "config.json"))
+	configs, err := cfg.Load()
 	assert.NoError(t, err)
 	client, err := store.New(configs.Postgres)
 	assert.NoError(t, err)

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
 
@@ -13,8 +12,7 @@ import (
 
 func main() {
 	r := chi.NewRouter()
-	configs := new(cfg.Cfg)
-	err := configs.Load(filepath.Join("..", "..", "deployment", "config.json"))
+	configs, err := cfg.Load()
 	if err != nil {
 		panic(err)
 	}
