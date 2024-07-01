@@ -12,6 +12,7 @@ import (
 )
 
 func TestStore_CreateGetSubscription(t *testing.T) {
+
 	ctx := context.Background()
 	client, cleanup, err := store.NewTestStore()
 	assert.NoError(t, err)
