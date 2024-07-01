@@ -37,8 +37,6 @@ jobs:
           - 5432:5432
 
     steps:
-      - name: Set up env
-        run : MBOT_ENV=testing
       - name: Check out code
         uses: actions/checkout@v4
 
@@ -55,4 +53,4 @@ jobs:
       - name: Run Migrations
         run: goose -dir migrations postgres "user=admin password=admin_password host=localhost port=5432 dbname=mbotdb sslmode=disable" up
       - name: run tests
-        run: go test -v ./...
+        run: MBOT_ENV=testing go test -v ./...

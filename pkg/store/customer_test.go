@@ -7,6 +7,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/rkuprov/mbot/pkg/cfg"
 	"github.com/rkuprov/mbot/pkg/store"
@@ -14,7 +15,7 @@ import (
 
 func TestStore_CreateCustomer(t *testing.T) {
 	configs, err := cfg.Load()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	client, err := store.New(configs.Postgres)
 	assert.NoError(t, err)
 
@@ -36,7 +37,7 @@ func TestStore_CreateCustomer(t *testing.T) {
 
 func TestStore_GetCustomer(t *testing.T) {
 	configs, err := cfg.Load()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	client, err := store.New(configs.Postgres)
 	assert.NoError(t, err)
 
