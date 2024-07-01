@@ -16,6 +16,13 @@ env:
   GOOSE_ENV: ${{ vars.GOOSE_ENV }}
   MBOT_ENV: testing
 
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+  POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
+  POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+  POSTGRES_DBNAME: ${{ vars.POSTGRES_DBNAME }}
+
+
 
 jobs:
   build:
