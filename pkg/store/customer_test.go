@@ -8,15 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/rkuprov/mbot/pkg/cfg"
 	"github.com/rkuprov/mbot/pkg/store"
 )
 
 func TestStore_CreateGetCustomer(t *testing.T) {
-	configs, err := cfg.Load()
+	client, cleanup, err := store.NewTestStore()
 	require.NoError(t, err)
-	client, err := store.New(configs.Postgres)
-	assert.NoError(t, err)
+	defer cleanup()
 
 	c := store.CustomerCreate{
 		Name:    gofakeit.Name(),

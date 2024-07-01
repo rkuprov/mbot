@@ -5,28 +5,32 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v7"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
-	"github.com/rkuprov/mbot/pkg/cfg"
 	"github.com/rkuprov/mbot/pkg/store"
 )
 
 func TestStore_CreateGetSubscription(t *testing.T) {
 	ctx := context.Background()
-	configs, err := cfg.Load()
-	require.NoError(t, err)
-	client, err := store.New(configs.Postgres)
+	client, cleanup, err := store.NewTestStore()
 	assert.NoError(t, err)
+	defer cleanup()
+
+	cid, err := client.CreateCustomer(ctx, store.CustomerCreate{
+		Name:    gofakeit.Name(),
+		Email:   gofakeit.Email(),
+		Contact: gofakeit.Phone(),
+	})
 
 	start := time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)
 	sub1 := store.SubscriptionCreate{
-		CustomerID:     "1",
+		CustomerID:     cid,
 		StartDate:      start,
 		ExpirationDate: start.AddDate(1, 0, 0),
 	}
 	sub2 := store.SubscriptionCreate{
-		CustomerID:     "1",
+		CustomerID:     cid,
 		StartDate:      start,
 		ExpirationDate: start.AddDate(1, 0, 0),
 	}
@@ -38,7 +42,7 @@ func TestStore_CreateGetSubscription(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, id2)
 
-	customer, err := client.GetCustomer(ctx, "1")
+	customer, err := client.GetCustomer(ctx, cid)
 	assert.NoError(t, err)
 	assert.Len(t, customer.SubscriptionIds, 2)
 
