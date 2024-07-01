@@ -29,8 +29,10 @@ jobs:
         image: postgres
         env:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_USER: admin
           POSTGRES_DB: mbotdb
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -55,8 +57,7 @@ jobs:
 
       - name: install goose
         run: go install github.com/pressly/goose/v3/cmd/goose@latest
-      - name: check goose
-        run: echo $GOOSE_DBSTRING
+
       - name: Run Migrations
         run: goose up
 
