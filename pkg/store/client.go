@@ -14,6 +14,11 @@ type Store struct {
 	pg *pgxpool.Pool
 }
 
+type TestStore struct {
+	*Store
+	Pool *pgxpool.Pool
+}
+
 func New(pCfg cfg.Postgres) (*Store, error) {
 	psql, err := pgxpool.New(context.Background(), fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=%s pool_max_conns=%d",
 		pCfg.User,
@@ -31,7 +36,7 @@ func New(pCfg cfg.Postgres) (*Store, error) {
 	}, nil
 }
 
-func NewTestStore() (*Store, func(), error) {
+func NewTestStore() (*TestStore, func(), error) {
 	configs, err := cfg.Load()
 	if err != nil {
 		return nil, nil, err
@@ -40,9 +45,13 @@ func NewTestStore() (*Store, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	return client, func() {
-		cleanup(client.pg)
-	}, nil
+	return &TestStore{
+			Store: client,
+			Pool:  client.pg,
+		},
+		func() {
+			cleanup(client.pg)
+		}, nil
 }
 
 func cleanup(psql *pgxpool.Pool) {

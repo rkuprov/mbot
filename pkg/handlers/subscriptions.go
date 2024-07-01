@@ -22,6 +22,10 @@ func Confirm(ctx context.Context, db *store.Store) http.HandlerFunc {
 			handleStoreError(w, err)
 			return
 		}
+		if err := db.RecordUsage(ctx, token); err != nil {
+			handleStoreError(w, err)
+			return
+		}
 
 		w.Write([]byte("subscription active"))
 	}
