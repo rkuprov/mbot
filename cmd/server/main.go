@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	// "github.com/go-chi/chi/v5"
 
 	"github.com/rkuprov/mbot/pkg/cfg"
 	"github.com/rkuprov/mbot/pkg/store"
 )
 
 func main() {
-	r := chi.NewRouter()
+	// r := chi.NewRouter()
+	r := http.NewServeMux()
 	configs, err := cfg.Load()
 	if err != nil {
 		panic(err)
