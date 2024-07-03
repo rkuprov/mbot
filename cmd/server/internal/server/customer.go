@@ -12,7 +12,7 @@ import (
 
 func (m *MBot) CreateCustomer(ctx context.Context,
 	req *connect.Request[mbotpb.CreateCustomerRequest]) (*connect.Response[mbotpb.CreateCustomerResponse], error) {
-	slug, err := m.db.CreateCustomer(ctx,
+	id, err := m.db.CreateCustomer(ctx,
 		store.CustomerCreate{
 			Name:    req.Msg.GetName(),
 			Email:   req.Msg.GetEmail(),
@@ -22,13 +22,13 @@ func (m *MBot) CreateCustomer(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	c, err := m.db.GetCustomer(ctx, slug)
+	c, err := m.db.GetCustomer(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	return &connect.Response[mbotpb.CreateCustomerResponse]{
 		Msg: &mbotpb.CreateCustomerResponse{
-			Message:         fmt.Sprintf("Customer created with ID: %s", slug),
+			Message:         fmt.Sprintf("Customer created with ID: %s", id),
 			Id:              c.GetId(),
 			SubscriptionIds: c.GetSubscriptionIds(),
 		},
