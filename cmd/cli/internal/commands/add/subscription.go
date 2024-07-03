@@ -6,8 +6,10 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/rkuprov/mbot/cmd/cli/internal/commands"
 	"github.com/rkuprov/mbot/cmd/cli/internal/ui"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
@@ -21,7 +23,7 @@ type Subscription struct {
 }
 
 func (s *Subscription) Run(ctx context.Context, client mbotpbconnect.MBotServerServiceClient) error {
-	startDate, endDate, err := s.toSubscriptionDates()
+	startDate, endDate, err := commands.ToSubscriptionDates(s.StartDate, s.EndDate, s.Duration)
 	if err != nil {
 		return err
 	}
@@ -35,24 +37,20 @@ func (s *Subscription) Run(ctx context.Context, client mbotpbconnect.MBotServerS
 		return err
 	}
 
-	ui.Single(resp.Msg)
-	return nil
-}
+	var pc ui.PrintCfg
 
-func (s *Subscription) toSubscriptionDates() (time.Time, time.Time, error) {
-	var endDate time.Time
-	switch {
-	case s.Duration == nil && s.EndDate.IsZero():
-		return time.Time{}, time.Time{}, fmt.Errorf("either duration or end date must be provided")
-	case s.Duration == nil:
-		endDate = s.EndDate
+	switch resp.Msg {
+	case nil:
+		pc.Title = "Failure!"
+		pc.Body = []table.Row{{resp.Msg.GetMessage()}}
 	default:
-		endDate = s.StartDate.AddDate(0, 0, *s.Duration)
+		pc.Title = fmt.Sprintf("Success! Subscription created for customer ID: %s", resp.Msg.GetCustomerId())
+		pc.Header = table.Row{"ID", "Start Date", "Expiration Date"}
+		pc.Body = []table.Row{{resp.Msg.GetSubscription().SubscriptionId,
+			resp.Msg.GetSubscription().GetStartDate().AsTime().Format("2006-01-02"),
+			resp.Msg.GetSubscription().GetExpirationDate().AsTime().Format("2006-01-02")}}
 	}
 
-	if s.StartDate.After(endDate) {
-		return time.Time{}, time.Time{}, fmt.Errorf("start date cannot be after end date")
-	}
-
-	return s.StartDate, endDate, nil
+	ui.Tabular(pc)
+	return nil
 }

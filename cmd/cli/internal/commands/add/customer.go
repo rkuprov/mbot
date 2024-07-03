@@ -2,8 +2,10 @@ package add
 
 import (
 	"context"
+	"fmt"
 
 	"connectrpc.com/connect"
+	"github.com/jedib0t/go-pretty/v6/table"
 
 	"github.com/rkuprov/mbot/cmd/cli/internal/ui"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
@@ -27,8 +29,16 @@ func (c *Customer) Run(ctx context.Context, client mbotpbconnect.MBotServerServi
 	if err != nil {
 		return err
 	}
+	var pc ui.PrintCfg
+	switch {
+	case resp.Msg == nil:
+		pc.Title = "Failure!"
+	default:
+		pc.Title = fmt.Sprintf("Success!")
+	}
+	pc.Body = []table.Row{{resp.Msg.GetMessage()}}
 
-	ui.Single(resp.Msg)
+	ui.Tabular(pc)
 
 	return nil
 }

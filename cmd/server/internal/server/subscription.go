@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 
 	"connectrpc.com/connect"
 
@@ -82,7 +81,7 @@ func (m *MBot) GetSubscriptionByCustomer(ctx context.Context,
 
 func (m *MBot) UpdateSubscription(ctx context.Context,
 	req *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error) {
-	err := m.db.UpdateSubscription(ctx, store.SubscriptionUpdate{
+	resp, err := m.db.UpdateSubscription(ctx, store.SubscriptionUpdate{
 		SubscriptionID: req.Msg.Id,
 		StartDate:      req.Msg.StartDate,
 		ExpirationDate: req.Msg.ExpirationDate,
@@ -91,11 +90,7 @@ func (m *MBot) UpdateSubscription(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	return &connect.Response[mbotpb.UpdateSubscriptionResponse]{
-		Msg: &mbotpb.UpdateSubscriptionResponse{
-			Message: fmt.Sprintf("Subscription %s has been updated.", req.Msg.Id),
-		},
-	}, nil
+	return &connect.Response[mbotpb.UpdateSubscriptionResponse]{Msg: resp}, nil
 }
 
 //
