@@ -5,7 +5,10 @@ import (
 	"fmt"
 
 	"connectrpc.com/connect"
+	"github.com/jedib0t/go-pretty/v6/table"
 
+	"github.com/rkuprov/mbot/cmd/cli/internal/commands"
+	"github.com/rkuprov/mbot/cmd/cli/internal/ui"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 )
@@ -38,7 +41,23 @@ func viewSubscription(ctx context.Context, client mbotpbconnect.MBotServerServic
 		return err
 	}
 
-	fmt.Println(resp.Msg)
+	var pc ui.PrintCfg
+	switch {
+	case resp.Msg == nil:
+		pc.Title = "Failure!"
+		pc.Body = []table.Row{{resp.Msg.String()}}
+	default:
+		pc.Title = fmt.Sprintf("Success!")
+		pc.Header = table.Row{"ID", "Customer ID", "Start Date", "Expiration Date"}
+		pc.Body = []table.Row{{
+			resp.Msg.Subscription.GetSubscriptionId(),
+			resp.Msg.Subscription.GetCustomerId(),
+			resp.Msg.Subscription.GetStartDate().AsTime().Format(commands.TimeLayout),
+			resp.Msg.Subscription.GetExpirationDate().AsTime().Format(commands.TimeLayout),
+		}}
+	}
+
+	ui.Tabular(pc)
 
 	return nil
 }
@@ -49,7 +68,24 @@ func viewAllSubscriptions(ctx context.Context, client mbotpbconnect.MBotServerSe
 		return err
 	}
 
-	fmt.Println(resp.Msg)
+	var pc ui.PrintCfg
+	switch {
+	case resp == nil:
+		pc.Title = "Failure!"
+	default:
+		pc.Title = fmt.Sprintf("Success! Total actice subscriptions: %d", len(resp.Msg.GetSubscriptions()))
+		pc.Header = table.Row{"ID", "Customer ID", "Start Date", "Expiration Date"}
+		for _, sub := range resp.Msg.GetSubscriptions() {
+			pc.Body = append(pc.Body, table.Row{
+				sub.SubscriptionId,
+				sub.CustomerId,
+				sub.StartDate.AsTime().Format(commands.TimeLayout),
+				sub.ExpirationDate.AsTime().Format(commands.TimeLayout),
+			})
+		}
+	}
+
+	ui.Tabular(pc)
 
 	return nil
 }
@@ -64,7 +100,23 @@ func viewSubscritpionByCustomer(ctx context.Context, client mbotpbconnect.MBotSe
 		return err
 	}
 
-	fmt.Println(resp.Msg)
+	var pc ui.PrintCfg
+	switch {
+	case resp == nil:
+		pc.Title = "Failure!"
+	default:
+		pc.Title = fmt.Sprintf("Success! Found %d active subscriptions for customer %s.", len(resp.Msg.GetSubscriptions()), id)
+		pc.Header = table.Row{"ID", "Start Date", "Expiration Date"}
+		for _, sub := range resp.Msg.GetSubscriptions() {
+			pc.Body = append(pc.Body, table.Row{
+				sub.SubscriptionId,
+				sub.StartDate.AsTime().Format(commands.TimeLayout),
+				sub.ExpirationDate.AsTime().Format(commands.TimeLayout),
+			})
+		}
+	}
+
+	ui.Tabular(pc)
 
 	return nil
 }

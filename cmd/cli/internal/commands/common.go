@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const TimeLayout = "2006-01-02"
+
 func ToSubscriptionDates(start, end time.Time, duration *int) (time.Time, time.Time, error) {
 	var endDate time.Time
 	switch {

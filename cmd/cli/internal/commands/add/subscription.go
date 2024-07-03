@@ -44,7 +44,7 @@ func (s *Subscription) Run(ctx context.Context, client mbotpbconnect.MBotServerS
 		pc.Title = "Failure!"
 		pc.Body = []table.Row{{resp.Msg.GetMessage()}}
 	default:
-		pc.Title = fmt.Sprintf("Success! Subscription created for customer ID: %s", resp.Msg.GetCustomerId())
+		pc.Title = fmt.Sprintf("Success! Subscription created for customer ID: %s", resp.Msg.GetSubscription().GetCustomerId())
 		pc.Header = table.Row{"ID", "Start Date", "Expiration Date"}
 		pc.Body = []table.Row{{resp.Msg.GetSubscription().SubscriptionId,
 			resp.Msg.GetSubscription().GetStartDate().AsTime().Format("2006-01-02"),

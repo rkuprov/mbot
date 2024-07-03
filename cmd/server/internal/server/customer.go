@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"connectrpc.com/connect"
 
@@ -20,6 +21,9 @@ func (m *MBot) CreateCustomer(ctx context.Context,
 		},
 	)
 	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint \"customers_email_key\"") {
+			return nil, fmt.Errorf("customer with email %s already exists", req.Msg.GetEmail())
+		}
 		return nil, err
 	}
 	c, err := m.db.GetCustomer(ctx, id)

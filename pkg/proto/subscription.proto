@@ -20,7 +20,6 @@ message CreateSubscriptionRequest {
 
 message CreateSubscriptionResponse {
   string message = 1;
-  string customer_id = 2;
   Subscription subscription = 3;
 }
 
@@ -29,8 +28,7 @@ message GetSubscriptionRequest {
 }
 
 message GetSubscriptionResponse {
-  Customer customer = 1;
-  Subscription subscription = 2;
+  Subscription subscription = 1;
 }
 
 message UpdateSubscriptionRequest {
