@@ -49,9 +49,9 @@ message UpdateCustomerResponse {
 }
 
 message DeleteCustomerRequest {
-  string slug = 1;
+  string id = 1;
 }
 
 message DeleteCustomerResponse {
-  string message = 1;
+  bool message = 1;
 }

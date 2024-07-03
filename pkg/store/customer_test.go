@@ -3,6 +3,7 @@ package store_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/stretchr/testify/assert"
@@ -52,5 +53,34 @@ func TestStore_CreateCustomerDuplicateEmail(t *testing.T) {
 		Contact: gofakeit.Phone(),
 	}
 	_, err = client.CreateCustomer(context.Background(), c2)
+	assert.Error(t, err)
+}
+
+func TestStore_DeleteCustomer(t *testing.T) {
+	client, cleanup, err := store.NewTestStore()
+	require.NoError(t, err)
+	defer cleanup()
+
+	c := store.CustomerCreate{
+		Name:    gofakeit.Name(),
+		Email:   gofakeit.LastName(),
+		Contact: gofakeit.Phone(),
+	}
+
+	id, err := client.CreateCustomer(context.Background(), c)
+	require.NoError(t, err)
+	sid, err := client.CreateSubscription(context.Background(), store.SubscriptionCreate{
+		CustomerID:     id,
+		StartDate:      time.Now(),
+		ExpirationDate: time.Now().AddDate(1, 0, 0),
+	})
+	require.NoError(t, err)
+
+	err = client.DeleteCustomer(context.Background(), id)
+	require.NoError(t, err)
+
+	_, err = client.GetCustomer(context.Background(), id)
+	assert.Error(t, err)
+	_, err = client.GetSubscription(context.Background(), sid)
 	assert.Error(t, err)
 }

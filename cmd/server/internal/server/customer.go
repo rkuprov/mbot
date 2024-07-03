@@ -103,14 +103,13 @@ func (m *MBot) UpdateCustomer(ctx context.Context,
 
 func (m *MBot) DeleteCustomer(ctx context.Context,
 	req *connect.Request[mbotpb.DeleteCustomerRequest]) (*connect.Response[mbotpb.DeleteCustomerResponse], error) {
-	// todo: implement delete customer
-	// err := m.db.DeleteCustomer(ctx, req.Msg.GetSlug())
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err := m.db.DeleteCustomer(ctx, req.Msg.GetId())
+	if err != nil {
+		return nil, err
+	}
 	return &connect.Response[mbotpb.DeleteCustomerResponse]{
 		Msg: &mbotpb.DeleteCustomerResponse{
-			Message: fmt.Sprintf("Customer deleted with ID: %s", req.Msg.GetSlug()),
+			Message: true,
 		},
 	}, nil
 }

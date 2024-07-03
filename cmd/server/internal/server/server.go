@@ -6,7 +6,6 @@ import (
 )
 
 type MBot struct {
-	// mbotpbconnect.UnimplementedMBotServerServiceHandler
 	db *store.Store
 }
 
