@@ -19,8 +19,20 @@ func Tabular(cfg PrintCfg) {
 	if len(cfg.Header) > 0 {
 		t.AppendHeader(cfg.Header)
 	}
-	if len(cfg.Body) > 0 {
-		t.AppendRows(cfg.Body)
+	if len(cfg.Body) == 0 {
+		t.Render()
 	}
+
+	rows := make([]table.Row, 0, 4)
+	for _, row := range cfg.Body {
+		rows = append(rows, row)
+		if len(rows) == 4 {
+			t.AppendRows(rows)
+			rows = rows[:0]
+			t.AppendSeparator()
+		}
+	}
+	t.AppendRows(rows)
+
 	t.Render()
 }

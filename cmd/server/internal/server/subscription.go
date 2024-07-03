@@ -26,7 +26,6 @@ func (m *MBot) CreateSubscription(ctx context.Context,
 	return &connect.Response[mbotpb.CreateSubscriptionResponse]{
 		Msg: &mbotpb.CreateSubscriptionResponse{
 			Message:      "subscription created successfully",
-			CustomerId:   req.Msg.GetCustomerId(),
 			Subscription: sub,
 		},
 	}, nil
