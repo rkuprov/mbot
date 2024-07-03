@@ -33,6 +33,5 @@ func Tabular(cfg PrintCfg) {
 		}
 	}
 	t.AppendRows(rows)
-
 	t.Render()
 }
