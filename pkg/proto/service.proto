@@ -11,7 +11,7 @@ service MBotServerService {
   rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse) {}
   rpc GetCustomersAll(GetCustomersAllRequest) returns (GetCustomersAllResponse) {}
   rpc UpdateCustomer(UpdateCustomerRequest) returns (UpdateCustomerResponse) {}
-//  rpc DeleteCustomer(DeleteCustomerRequest) returns (DeleteCustomerResponse) {}
+  rpc DeleteCustomer(DeleteCustomerRequest) returns (DeleteCustomerResponse) {}
 
   rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse) {}
   rpc GetSubscription(GetSubscriptionRequest) returns (GetSubscriptionResponse) {}

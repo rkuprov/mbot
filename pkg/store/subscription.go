@@ -71,7 +71,7 @@ func (s *Store) GetSubscription(ctx context.Context, id string) (*mbotpb.Subscri
    			start_date,	
    			expiration_date	
    		FROM subscriptions
-   		WHERE id = $1
+   		WHERE id = $1 and is_active = true
    `, id).Scan(
 		&sub.SubscriptionId,
 		&sub.CustomerId,

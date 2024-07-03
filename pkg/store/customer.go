@@ -47,7 +47,7 @@ func (s *Store) GetCustomer(ctx context.Context, id string) (mbotpb.Customer, er
        ARRAY_AGG(subscriptions.id) as subscription_ids
 from customers
          left join subscriptions on subscriptions.customer_id = customers.id
-where customers.id = $1
+where customers.id = $1 and customers.is_active = true 
 GROUP BY customers.id;
 	`, id).Scan(
 		&c.Id,
@@ -82,6 +82,7 @@ func (s *Store) GetCustomersAll(ctx context.Context) ([]mbotpb.Customer, error) 
 		ARRAY_AGG(subscriptions.id) as subscription_ids
 	FROM customers
 	LEFT JOIN subscriptions ON subscriptions.customer_id = customers.id
+	WHERE customers.is_active = true 
 	GROUP BY customers.id
 	ORDER BY customers.id;
 	`)
@@ -125,6 +126,25 @@ func (s *Store) UpdateCustomer(ctx context.Context, id string, in CustomerUpdate
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func (s *Store) DeleteCustomer(ctx context.Context, id string) error {
+	tx, err := s.pg.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	_, err = tx.Exec(ctx, `UPDATE customers SET is_active=false WHERE id = $1`, id)
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec(ctx, `UPDATE subscriptions SET is_active=false WHERE customer_id = $1`, id)
+	if err != nil {
+		return err
+	}
+	tx.Commit(ctx)
 
 	return nil
 }

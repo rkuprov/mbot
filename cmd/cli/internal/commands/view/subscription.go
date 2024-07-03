@@ -3,8 +3,10 @@ package view
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"connectrpc.com/connect"
+	"github.com/jackc/pgx/v5"
 	"github.com/jedib0t/go-pretty/v6/table"
 
 	"github.com/rkuprov/mbot/cmd/cli/internal/commands"
@@ -38,6 +40,12 @@ func viewSubscription(ctx context.Context, client mbotpbconnect.MBotServerServic
 		},
 	})
 	if err != nil {
+		if strings.Contains(err.Error(), pgx.ErrNoRows.Error()) {
+			ui.Tabular(ui.PrintCfg{
+				Body: []table.Row{{fmt.Sprintf("Subscription %s is not active", id)}},
+			})
+			return nil
+		}
 		return err
 	}
 
@@ -97,6 +105,12 @@ func viewSubscritpionByCustomer(ctx context.Context, client mbotpbconnect.MBotSe
 		},
 	})
 	if err != nil {
+		if strings.Contains(err.Error(), pgx.ErrNoRows.Error()) {
+			ui.Tabular(ui.PrintCfg{
+				Body: []table.Row{{fmt.Sprintf("Subscription %s is not active", id)}},
+			})
+			return nil
+		}
 		return err
 	}
 

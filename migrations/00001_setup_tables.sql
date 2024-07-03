@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS subscriptions
     customer_id     INT          NOT NULL references customers (id),
     start_date      DATE         NOT NULL,
     expiration_date DATE         NOT NULL,
+    is_active       BOOLEAN      DEFAULT TRUE,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

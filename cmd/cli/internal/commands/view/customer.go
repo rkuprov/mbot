@@ -3,8 +3,10 @@ package view
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"connectrpc.com/connect"
+	"github.com/jackc/pgx/v5"
 	"github.com/jedib0t/go-pretty/v6/table"
 
 	"github.com/rkuprov/mbot/cmd/cli/internal/ui"
@@ -32,6 +34,12 @@ func viewCustomer(ctx context.Context, client mbotpbconnect.MBotServerServiceCli
 		},
 	})
 	if err != nil {
+		if strings.Contains(err.Error(), pgx.ErrNoRows.Error()) {
+			ui.Tabular(ui.PrintCfg{
+				Body: []table.Row{{fmt.Sprintf("Customer with ID %s not found", id)}},
+			})
+			return nil
+		}
 		return err
 	}
 
@@ -42,7 +50,8 @@ func viewCustomer(ctx context.Context, client mbotpbconnect.MBotServerServiceCli
 		pc.Body = []table.Row{{resp.Msg.String()}}
 	default:
 		pc.Title = fmt.Sprintf("Success!")
-		pc.Header = table.Row{"ID", "Name", "Email", "Contact", "Subscriptions"}
+		subCount := len(resp.Msg.Customer.GetSubscriptionIds())
+		pc.Header = table.Row{"ID", "Name", "Email", "Contact", fmt.Sprintf("Subscription ID (%d)", subCount)}
 		row := table.Row{
 			resp.Msg.Customer.GetId(),
 			resp.Msg.Customer.GetName(),
@@ -56,6 +65,7 @@ func viewCustomer(ctx context.Context, client mbotpbconnect.MBotServerServiceCli
 		for i, sub := range resp.Msg.Customer.GetSubscriptionIds() {
 			if i == 0 {
 				pc.Body = []table.Row{append(row, sub)}
+				continue
 			}
 			pc.Body = append(pc.Body, table.Row{"", "", "", "", sub})
 		}
@@ -76,6 +86,8 @@ func viewAllCustomers(ctx context.Context, client mbotpbconnect.MBotServerServic
 	switch {
 	case resp == nil:
 		pc.Title = "Failure!"
+	case len(resp.Msg.GetCustomers()) == 0:
+		pc.Body = []table.Row{{"No active customers found"}}
 	default:
 		pc.Title = fmt.Sprintf("Success! Found %d active customers", len(resp.Msg.GetCustomers()))
 		pc.Header = table.Row{"ID", "Name", "Email", "Contact", "Subscription Count"}
