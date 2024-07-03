@@ -31,3 +31,26 @@ func TestStore_CreateGetCustomer(t *testing.T) {
 	assert.Equal(t, c.Email, out.Email)
 	assert.Equal(t, c.Contact, out.Contact)
 }
+
+func TestStore_CreateCustomerDuplicateEmail(t *testing.T) {
+	client, cleanup, err := store.NewTestStore()
+	require.NoError(t, err)
+	defer cleanup()
+
+	c := store.CustomerCreate{
+		Name:    gofakeit.Name(),
+		Email:   gofakeit.LastName(),
+		Contact: gofakeit.Phone(),
+	}
+
+	_, err = client.CreateCustomer(context.Background(), c)
+	require.NoError(t, err)
+
+	c2 := store.CustomerCreate{
+		Name:    gofakeit.Name(),
+		Email:   c.Email,
+		Contact: gofakeit.Phone(),
+	}
+	_, err = client.CreateCustomer(context.Background(), c2)
+	assert.Error(t, err)
+}
