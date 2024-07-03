@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/rkuprov/mbot/cmd/cli/internal/ui"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 )
@@ -34,8 +35,7 @@ func (s *Subscription) Run(ctx context.Context, client mbotpbconnect.MBotServerS
 		return err
 	}
 
-	fmt.Println(resp.Msg.GetMessage())
-
+	ui.Single(resp.Msg)
 	return nil
 }
 
