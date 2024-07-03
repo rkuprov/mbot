@@ -116,7 +116,8 @@ func (s *Store) GetSubscriptionsAll(ctx context.Context) ([]*mbotpb.Subscription
 
 func (s *Store) GetSubscriptionByCustomer(ctx context.Context, customerID string) ([]*mbotpb.Subscription, error) {
 	var out []*mbotpb.Subscription
-	rows, err := s.pg.Query(ctx, `SELECT id, start_date, expiration_date FROM subscriptions WHERE customer_id = $1`, customerID)
+	rows, err := s.pg.Query(ctx, `SELECT id, start_date, expiration_date FROM subscriptions 
+	WHERE customer_id = $1 ORDER BY start_date`, customerID)
 	if err != nil {
 		return nil, err
 	}
