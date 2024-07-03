@@ -152,14 +152,17 @@ func (s *Store) DeleteSubscription(_ context.Context, id, subId string) error {
 }
 
 // UpdateSubscription will perform up update.
-func (s *Store) UpdateSubscription(ctx context.Context, in SubscriptionUpdate) error {
+func (s *Store) UpdateSubscription(ctx context.Context, in SubscriptionUpdate) (*mbotpb.UpdateSubscriptionResponse, error) {
+	var resp mbotpb.UpdateSubscriptionResponse
 	sub, err := s.GetSubscription(ctx, in.SubscriptionID)
 	if err != nil {
-		return fmt.Errorf("failed to get subscription: %w", err)
+		return nil, fmt.Errorf("failed to get subscription: %w", err)
 	}
+	resp.StartDate = sub.StartDate
+	resp.ExpirationDate = sub.ExpirationDate
 
 	if err = validUpdate(sub, in); err != nil {
-		return fmt.Errorf("invalid update: %w", err)
+		return nil, fmt.Errorf("invalid update: %w", err)
 	}
 
 	_, err = s.pg.Exec(ctx, `
@@ -168,12 +171,14 @@ func (s *Store) UpdateSubscription(ctx context.Context, in SubscriptionUpdate) e
 			start_date = $1,
 			expiration_date = $2
 		WHERE id = $3
-	`, in.StartDate, in.ExpirationDate, in.SubscriptionID)
+	`, in.StartDate.AsTime(), in.ExpirationDate.AsTime(), in.SubscriptionID)
 	if err != nil {
-		return fmt.Errorf("failed to update subscription: %w", err)
+		return nil, fmt.Errorf("failed to update subscription: %w", err)
 	}
+	resp.UpdatedExpirationDate = in.ExpirationDate
+	resp.UpdatedStartDate = in.StartDate
 
-	return nil
+	return &resp, nil
 }
 
 func validUpdate(sub *mbotpb.Subscription, in SubscriptionUpdate) error {
