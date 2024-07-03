@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS stats
 (
-    customer_id INT NOT NULL,
+    customer_id INT NOT NULL references customers (id),
     subscription_id VARCHAR(36) NOT NULL references subscriptions (id),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

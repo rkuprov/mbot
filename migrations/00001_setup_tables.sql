@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS customers
     name       VARCHAR(255) NOT NULL,
     email      VARCHAR(255) NOT NULL,
     contact    TEXT,
+    is_active  BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
