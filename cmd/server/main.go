@@ -4,15 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	// "github.com/go-chi/chi/v5"
-
 	"github.com/rkuprov/mbot/pkg/cfg"
 	"github.com/rkuprov/mbot/pkg/store"
 )
 
 func main() {
-	// r := chi.NewRouter()
-	r := http.NewServeMux()
+	mux := http.NewServeMux()
 	configs, err := cfg.Load()
 	if err != nil {
 		panic(err)
@@ -22,10 +19,10 @@ func main() {
 		panic(err)
 	}
 
-	SetupRoutes(r, db)
+	SetupRoutes(mux, db)
 
 	fmt.Println("Starting MBOT service")
-	err = http.ListenAndServe("localhost:8080", r)
+	err = http.ListenAndServe("localhost:8080", mux)
 	if err != nil {
 		panic(err)
 	}

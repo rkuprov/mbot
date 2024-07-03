@@ -5,14 +5,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-
 	"github.com/rkuprov/mbot/pkg/store"
 )
 
 func Confirm(ctx context.Context, db *store.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		token := chi.URLParam(r, "token")
+		token := r.PathValue("token")
 		if token == "" {
 			http.Error(w, "token is required", http.StatusBadRequest)
 			return
