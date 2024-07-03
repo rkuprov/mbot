@@ -26,10 +26,20 @@ func Single(msg interface{}) {
 		text = []string{resp.GetSubscription().SubscriptionId,
 			resp.GetSubscription().GetStartDate().AsTime().Format("2006-01-02"),
 			resp.GetSubscription().GetExpirationDate().AsTime().Format("2006-01-02")}
+	case *mbotpb.CreateCustomerResponse:
+		fmt.Println("CreateCustomerResponse")
+		if resp.GetId() == "" {
+			title = "Failure!"
+			text = append(text, resp.GetMessage())
+		}
+		title = fmt.Sprintf("Success!")
+		text = []string{resp.GetMessage()}
 	}
 
 	t.SetTitle(title)
-	t.AppendHeader(header)
+	if len(header) > 0 {
+		t.AppendHeader(header)
+	}
 	row := table.Row{}
 	for _, txt := range text {
 		row = append(row, txt)

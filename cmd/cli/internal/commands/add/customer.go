@@ -2,10 +2,10 @@ package add
 
 import (
 	"context"
-	"fmt"
 
 	"connectrpc.com/connect"
 
+	"github.com/rkuprov/mbot/cmd/cli/internal/ui"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 )
@@ -27,6 +27,8 @@ func (c *Customer) Run(ctx context.Context, client mbotpbconnect.MBotServerServi
 	if err != nil {
 		return err
 	}
-	fmt.Println(resp.Msg.GetMessage())
+
+	ui.Single(resp.Msg)
+
 	return nil
 }
