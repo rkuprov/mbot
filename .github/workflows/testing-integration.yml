@@ -23,7 +23,7 @@ env:
 
 
 jobs:
-  testing-deploy-and-test:
+  testing-deploy-and-test-server:
     runs-on: ubuntu-latest
     environment: testing
     services:
@@ -59,10 +59,36 @@ jobs:
       - name: run migrations
         run: goose up
 
-      - name: build server
-        run: cd cmd/server && go build -v .
-      - name: build client
-        run: cd cmd/cli && go build -v .
-
       - name: run tests
         run: go test -v ./...
+
+      - name: build server
+        run: cd cmd/server && go build -v .
+      - name: run server
+        run: ./cmd/server/server
+
+  testing-deploy-and-test-client:
+    runs-on: ubuntu-latest
+    environment: testing
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      - name: build client
+        run: cd cmd/cli && go install -v .
+
+      - name: run add customer
+        run: cli add customer --name=john --email=doe@gmail.com --contact=none
+      - name: run get customer
+        run: cli get customer 1
+      - name: run view customers all
+        run: cli view customers --all
+      - name: run add subscription
+        run: cli add subscription 1 --start-date=2030-01-01 --end-date=2030-12-31
+      - name: run view subscription
+        run: cli view subscription --customer-id=1
+      - name: run view subscription all
+        run: cli view subscription --all
