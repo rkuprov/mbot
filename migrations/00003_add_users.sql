@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE login
+CREATE TABLE users
 (
     id         SERIAL PRIMARY KEY,
     username   VARCHAR(255) NOT NULL UNIQUE,
@@ -12,5 +12,5 @@ CREATE TABLE login
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE login;
+DROP TABLE users;
 -- +goose StatementEnd
