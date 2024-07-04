@@ -59,9 +59,10 @@ jobs:
       - name: run migrations
         run: goose up
 
-
-      - name: build
-        run: go build -v ./...
+      - name: build server
+        run: cd cmd/server && go build -v .
+      - name: build client
+        run: cd cmd/cli && go build -v .
 
       - name: run tests
         run: go test -v ./...
