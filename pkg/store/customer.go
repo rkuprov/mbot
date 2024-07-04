@@ -40,25 +40,26 @@ func (s *Store) GetCustomer(ctx context.Context, id string) (mbotpb.Customer, er
 	var subs pgtype.Array[*string]
 	err := s.pg.QueryRow(ctx, `
 		SELECT 
-	   customers.id,
+	   id,
        name,
        email,
-       contact,
-       ARRAY_AGG(subscriptions.id) as subscription_ids
-from customers
-         left join subscriptions on subscriptions.customer_id = customers.id
-where customers.id = $1 and customers.is_active = true 
-GROUP BY customers.id;
+       contact
+		from customers
+where customers.id = $1 and customers.is_active = true
 	`, id).Scan(
 		&c.Id,
 		&c.Name,
 		&c.Email,
 		&c.Contact,
-		&subs,
 	)
 	if err != nil {
 		return mbotpb.Customer{}, err
 	}
+	err = s.pg.QueryRow(ctx, `
+		SELECT ARRAY_AGG(subscriptions.id) as subscription_ids
+		FROM subscriptions
+		WHERE subscriptions.customer_id = $1 and subscriptions.is_active = true
+	`, id).Scan(&subs)
 
 	for _, sub := range subs.Elements {
 		if sub == nil {
@@ -78,12 +79,9 @@ func (s *Store) GetCustomersAll(ctx context.Context) ([]mbotpb.Customer, error) 
 		customers.id,
 		name,
 		email,
-		contact,
-		ARRAY_AGG(subscriptions.id) as subscription_ids
+		contact
 	FROM customers
-	LEFT JOIN subscriptions ON subscriptions.customer_id = customers.id
 	WHERE customers.is_active = true 
-	GROUP BY customers.id
 	ORDER BY customers.id;
 	`)
 	if err != nil {
@@ -99,10 +97,18 @@ func (s *Store) GetCustomersAll(ctx context.Context) ([]mbotpb.Customer, error) 
 			&c.Name,
 			&c.Email,
 			&c.Contact,
-			&subs,
 		); err != nil {
 			return nil, err
 		}
+		err = s.pg.QueryRow(ctx, `
+		SELECT ARRAY_AGG(subscriptions.id) as subscription_ids
+		FROM subscriptions
+		WHERE subscriptions.customer_id = $1 and subscriptions.is_active = true
+		`, c.Id).Scan(&subs)
+		if err != nil {
+			return nil, err
+		}
+
 		for _, sub := range subs.Elements {
 			if sub == nil {
 				continue

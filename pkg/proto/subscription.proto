@@ -50,7 +50,7 @@ message DeleteSubscriptionRequest {
 }
 
 message DeleteSubscriptionResponse {
-  string message = 1;
+  bool deleted = 1;
 }
 
 message GetSubscriptionsAllRequest {}

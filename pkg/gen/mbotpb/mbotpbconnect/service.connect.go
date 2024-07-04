@@ -60,6 +60,9 @@ const (
 	// MBotServerServiceUpdateSubscriptionProcedure is the fully-qualified name of the
 	// MBotServerService's UpdateSubscription RPC.
 	MBotServerServiceUpdateSubscriptionProcedure = "/mbot.MBotServerService/UpdateSubscription"
+	// MBotServerServiceDeleteSubscriptionProcedure is the fully-qualified name of the
+	// MBotServerService's DeleteSubscription RPC.
+	MBotServerServiceDeleteSubscriptionProcedure = "/mbot.MBotServerService/DeleteSubscription"
 	// MBotServerServiceGetSubscriptionByCustomerProcedure is the fully-qualified name of the
 	// MBotServerService's GetSubscriptionByCustomer RPC.
 	MBotServerServiceGetSubscriptionByCustomerProcedure = "/mbot.MBotServerService/GetSubscriptionByCustomer"
@@ -77,6 +80,7 @@ var (
 	mBotServerServiceGetSubscriptionMethodDescriptor           = mBotServerServiceServiceDescriptor.Methods().ByName("GetSubscription")
 	mBotServerServiceGetSubscriptionsAllMethodDescriptor       = mBotServerServiceServiceDescriptor.Methods().ByName("GetSubscriptionsAll")
 	mBotServerServiceUpdateSubscriptionMethodDescriptor        = mBotServerServiceServiceDescriptor.Methods().ByName("UpdateSubscription")
+	mBotServerServiceDeleteSubscriptionMethodDescriptor        = mBotServerServiceServiceDescriptor.Methods().ByName("DeleteSubscription")
 	mBotServerServiceGetSubscriptionByCustomerMethodDescriptor = mBotServerServiceServiceDescriptor.Methods().ByName("GetSubscriptionByCustomer")
 )
 
@@ -91,7 +95,7 @@ type MBotServerServiceClient interface {
 	GetSubscription(context.Context, *connect.Request[mbotpb.GetSubscriptionRequest]) (*connect.Response[mbotpb.GetSubscriptionResponse], error)
 	GetSubscriptionsAll(context.Context, *connect.Request[mbotpb.GetSubscriptionsAllRequest]) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error)
 	UpdateSubscription(context.Context, *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error)
-	// rpc DeleteSubscription(DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse) {}
+	DeleteSubscription(context.Context, *connect.Request[mbotpb.DeleteSubscriptionRequest]) (*connect.Response[mbotpb.DeleteSubscriptionResponse], error)
 	GetSubscriptionByCustomer(context.Context, *connect.Request[mbotpb.GetSubscriptionByCustomerRequest]) (*connect.Response[mbotpb.GetSubscriptionByCustomerResponse], error)
 }
 
@@ -159,6 +163,12 @@ func NewMBotServerServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(mBotServerServiceUpdateSubscriptionMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		deleteSubscription: connect.NewClient[mbotpb.DeleteSubscriptionRequest, mbotpb.DeleteSubscriptionResponse](
+			httpClient,
+			baseURL+MBotServerServiceDeleteSubscriptionProcedure,
+			connect.WithSchema(mBotServerServiceDeleteSubscriptionMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		getSubscriptionByCustomer: connect.NewClient[mbotpb.GetSubscriptionByCustomerRequest, mbotpb.GetSubscriptionByCustomerResponse](
 			httpClient,
 			baseURL+MBotServerServiceGetSubscriptionByCustomerProcedure,
@@ -179,6 +189,7 @@ type mBotServerServiceClient struct {
 	getSubscription           *connect.Client[mbotpb.GetSubscriptionRequest, mbotpb.GetSubscriptionResponse]
 	getSubscriptionsAll       *connect.Client[mbotpb.GetSubscriptionsAllRequest, mbotpb.GetSubscriptionsAllResponse]
 	updateSubscription        *connect.Client[mbotpb.UpdateSubscriptionRequest, mbotpb.UpdateSubscriptionResponse]
+	deleteSubscription        *connect.Client[mbotpb.DeleteSubscriptionRequest, mbotpb.DeleteSubscriptionResponse]
 	getSubscriptionByCustomer *connect.Client[mbotpb.GetSubscriptionByCustomerRequest, mbotpb.GetSubscriptionByCustomerResponse]
 }
 
@@ -227,6 +238,11 @@ func (c *mBotServerServiceClient) UpdateSubscription(ctx context.Context, req *c
 	return c.updateSubscription.CallUnary(ctx, req)
 }
 
+// DeleteSubscription calls mbot.MBotServerService.DeleteSubscription.
+func (c *mBotServerServiceClient) DeleteSubscription(ctx context.Context, req *connect.Request[mbotpb.DeleteSubscriptionRequest]) (*connect.Response[mbotpb.DeleteSubscriptionResponse], error) {
+	return c.deleteSubscription.CallUnary(ctx, req)
+}
+
 // GetSubscriptionByCustomer calls mbot.MBotServerService.GetSubscriptionByCustomer.
 func (c *mBotServerServiceClient) GetSubscriptionByCustomer(ctx context.Context, req *connect.Request[mbotpb.GetSubscriptionByCustomerRequest]) (*connect.Response[mbotpb.GetSubscriptionByCustomerResponse], error) {
 	return c.getSubscriptionByCustomer.CallUnary(ctx, req)
@@ -243,7 +259,7 @@ type MBotServerServiceHandler interface {
 	GetSubscription(context.Context, *connect.Request[mbotpb.GetSubscriptionRequest]) (*connect.Response[mbotpb.GetSubscriptionResponse], error)
 	GetSubscriptionsAll(context.Context, *connect.Request[mbotpb.GetSubscriptionsAllRequest]) (*connect.Response[mbotpb.GetSubscriptionsAllResponse], error)
 	UpdateSubscription(context.Context, *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error)
-	// rpc DeleteSubscription(DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse) {}
+	DeleteSubscription(context.Context, *connect.Request[mbotpb.DeleteSubscriptionRequest]) (*connect.Response[mbotpb.DeleteSubscriptionResponse], error)
 	GetSubscriptionByCustomer(context.Context, *connect.Request[mbotpb.GetSubscriptionByCustomerRequest]) (*connect.Response[mbotpb.GetSubscriptionByCustomerResponse], error)
 }
 
@@ -307,6 +323,12 @@ func NewMBotServerServiceHandler(svc MBotServerServiceHandler, opts ...connect.H
 		connect.WithSchema(mBotServerServiceUpdateSubscriptionMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	mBotServerServiceDeleteSubscriptionHandler := connect.NewUnaryHandler(
+		MBotServerServiceDeleteSubscriptionProcedure,
+		svc.DeleteSubscription,
+		connect.WithSchema(mBotServerServiceDeleteSubscriptionMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	mBotServerServiceGetSubscriptionByCustomerHandler := connect.NewUnaryHandler(
 		MBotServerServiceGetSubscriptionByCustomerProcedure,
 		svc.GetSubscriptionByCustomer,
@@ -333,6 +355,8 @@ func NewMBotServerServiceHandler(svc MBotServerServiceHandler, opts ...connect.H
 			mBotServerServiceGetSubscriptionsAllHandler.ServeHTTP(w, r)
 		case MBotServerServiceUpdateSubscriptionProcedure:
 			mBotServerServiceUpdateSubscriptionHandler.ServeHTTP(w, r)
+		case MBotServerServiceDeleteSubscriptionProcedure:
+			mBotServerServiceDeleteSubscriptionHandler.ServeHTTP(w, r)
 		case MBotServerServiceGetSubscriptionByCustomerProcedure:
 			mBotServerServiceGetSubscriptionByCustomerHandler.ServeHTTP(w, r)
 		default:
@@ -378,6 +402,10 @@ func (UnimplementedMBotServerServiceHandler) GetSubscriptionsAll(context.Context
 
 func (UnimplementedMBotServerServiceHandler) UpdateSubscription(context.Context, *connect.Request[mbotpb.UpdateSubscriptionRequest]) (*connect.Response[mbotpb.UpdateSubscriptionResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.UpdateSubscription is not implemented"))
+}
+
+func (UnimplementedMBotServerServiceHandler) DeleteSubscription(context.Context, *connect.Request[mbotpb.DeleteSubscriptionRequest]) (*connect.Response[mbotpb.DeleteSubscriptionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.DeleteSubscription is not implemented"))
 }
 
 func (UnimplementedMBotServerServiceHandler) GetSubscriptionByCustomer(context.Context, *connect.Request[mbotpb.GetSubscriptionByCustomerRequest]) (*connect.Response[mbotpb.GetSubscriptionByCustomerResponse], error) {

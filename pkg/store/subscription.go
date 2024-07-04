@@ -138,17 +138,14 @@ func (s *Store) GetSubscriptionByCustomer(ctx context.Context, customerID string
 	return out, nil
 }
 
-// not implemented
-func (s *Store) DeleteSubscription(_ context.Context, id, subId string) error {
-	// return s.db.Update(func(tx *bbolt.Tx) error {
-	// 	err := tx.Bucket(subscriptions).Delete([]byte(subId))
-	// 	if err != nil {
-	// 		return fmt.Errorf("failed to delete from subscriptions: %w", err)
-	// 	}
-	// 	err = tx.Bucket(customersBucket).Bucket([]byte(id)).Bucket(subscriptions).Delete([]byte(subId))
-	// 	if err != nil {
-	// 		return fmt.Errorf("failed to delete from customer: %w", err)
-	// 	}
+func (s *Store) DeleteSubscription(ctx context.Context, id string) error {
+	_, err := s.pg.Exec(ctx, `
+		UPDATE subscriptions SET is_active = false WHERE id = $1
+	`, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
