@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
-	"fmt"
 
 	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -19,7 +18,6 @@ func (a *Auth) Login(ctx context.Context, username, password string) (SessionTok
 	if err != nil {
 		return SessionToken{}, err
 	}
-	fmt.Println("authenticated")
 	token := newSessionToken(id)
 
 	_, err = a.pg.Exec(ctx, `
@@ -86,7 +84,6 @@ func (a *Auth) NewUser(ctx context.Context, username, password string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("user created")
 	return nil
 }
 

@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -17,11 +16,9 @@ func TestAuth_ConfirmAndRotateToken(t *testing.T) {
 	require.NoError(t, err)
 	defer done()
 
-	fmt.Println("creating user")
 	err = auth.NewUser(ctx, "testuser", "test")
 	require.NoError(t, err)
 
-	fmt.Println("logging in")
 	token, err := auth.Login(ctx, "testuser", "test")
 	require.NoError(t, err)
 	token2, err := auth.ConfirmAndRotateToken(ctx, token)
