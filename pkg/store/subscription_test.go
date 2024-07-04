@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/rkuprov/mbot/pkg/store"
@@ -58,4 +59,35 @@ func TestStore_CreateGetSubscription(t *testing.T) {
 	assert.Equal(t, sub2.CustomerID, out2.CustomerId)
 	assert.Equal(t, sub2.StartDate, out2.StartDate.AsTime())
 	assert.Equal(t, sub2.ExpirationDate, out2.ExpirationDate.AsTime())
+}
+
+func TestStore_DeleteSubscription(t *testing.T) {
+	ctx := context.Background()
+	client, cleanup, err := store.NewTestStore()
+	assert.NoError(t, err)
+	defer cleanup()
+
+	cid, err := client.CreateCustomer(ctx, store.CustomerCreate{
+		Name:    gofakeit.Name(),
+		Email:   gofakeit.Email(),
+		Contact: gofakeit.Phone(),
+	})
+
+	start := time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)
+	sub := store.SubscriptionCreate{
+		CustomerID:     cid,
+		StartDate:      start,
+		ExpirationDate: start.AddDate(1, 0, 0),
+	}
+
+	id, err := client.CreateSubscription(ctx, sub)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, id)
+
+	err = client.DeleteSubscription(ctx, id)
+	assert.NoError(t, err)
+
+	_, err = client.GetSubscription(ctx, id)
+	assert.Error(t, err)
+	assert.Equal(t, pgx.ErrNoRows, err)
 }

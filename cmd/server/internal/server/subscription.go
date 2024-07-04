@@ -92,33 +92,15 @@ func (m *MBot) UpdateSubscription(ctx context.Context,
 	return &connect.Response[mbotpb.UpdateSubscriptionResponse]{Msg: resp}, nil
 }
 
-//
-// func (m *MBot) DeleteSubscription(ctx context.Context,
-// 	req *connect.Request[mbotpb.DeleteSubscriptionRequest]) (*connect.Response[mbotpb.DeleteSubscriptionResponse], error) {
-// 	err := m.db.DeleteSubscription(ctx, req.Msg.GetId())
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &connect.Response[mbotpb.DeleteSubscriptionResponse]{
-// 		Msg: &mbotpb.DeleteSubscriptionResponse{
-// 			Message: fmt.Sprintf("Subscription deleted with ID: %s", req.Msg.GetId()),
-// 		},
-// 	}, nil
-// }
-//
-// func (m *MBot) GetSubcriptionByCustomer(ctx context.Context,
-// 	req *connect.Request[mbotpb.GetSubscriptionByCustomerRequest]) (*connect.Response[mbotpb.GetSubscriptionByCustomerResponse], error) {
-// 	sub, err := m.db.GetSubscriptionByCustomer(ctx, req.Msg.GetSlug())
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &connect.Response[mbotpb.GetSubscriptionByCustomerResponse]{
-// 		Msg: &mbotpb.GetSubscriptionByCustomerResponse{
-// 			Subscription: &mbotpb.Subscription{
-// 				Id:                 sub.Id,
-// 				Slug:               sub.Slug,
-// 				SubscriptionExpiry: sub.SubscriptionExpiry,
-// 			},
-// 		},
-// 	}, nil
-// }
+func (m *MBot) DeleteSubscription(ctx context.Context,
+	req *connect.Request[mbotpb.DeleteSubscriptionRequest]) (*connect.Response[mbotpb.DeleteSubscriptionResponse], error) {
+	err := m.db.DeleteSubscription(ctx, req.Msg.GetSubscriptionId())
+	if err != nil {
+		return nil, err
+	}
+	return &connect.Response[mbotpb.DeleteSubscriptionResponse]{
+		Msg: &mbotpb.DeleteSubscriptionResponse{
+			Deleted: true,
+		},
+	}, nil
+}
