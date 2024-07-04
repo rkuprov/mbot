@@ -23,6 +23,7 @@ var (
 	ErrSubscriptionNotFound  = fmt.Errorf("subscription not found")
 	ErrSubscriptionExpired   = fmt.Errorf("subscription expired")
 	ErrSubscriptionNotActive = fmt.Errorf("subscription not active")
+	ErrSubscriptionCanceled  = fmt.Errorf("subscription is canceled")
 )
 
 type SubscriptionCreate struct {
@@ -208,21 +209,31 @@ func (s *Store) ConfirmSubscription(ctx context.Context, token string) error {
 	var startDate time.Time
 	var expirationDate time.Time
 	var id string
+	var isActive bool
 	err := s.pg.QueryRow(ctx, `
 	SELECT 
 	id,
 	start_date,
-	expiration_date
+	expiration_date,
+	is_active
 	FROM subscriptions 
 	WHERE id = $1 
 	`,
 		token,
-	).Scan(&id, &startDate, &expirationDate)
+	).Scan(
+		&id,
+		&startDate,
+		&expirationDate,
+		&isActive,
+	)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return ErrSubscriptionNotFound
 	}
 	if err != nil {
 		return err
+	}
+	if !isActive {
+		return ErrSubscriptionCanceled
 	}
 	if time.Now().Before(startDate) {
 		return ErrSubscriptionNotActive

@@ -26,8 +26,12 @@ var file_service_proto_rawDesc = []byte{
 	0x04, 0x6d, 0x62, 0x6f, 0x74, 0x1a, 0x0e, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x0b, 0x73, 0x74, 0x61, 0x74, 0x73, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x1a, 0x12, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0xc9, 0x07, 0x0a, 0x11, 0x4d, 0x42, 0x6f, 0x74, 0x53,
-	0x65, 0x72, 0x76, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x4d, 0x0a, 0x0e,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x0a, 0x61, 0x75, 0x74, 0x68, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x32, 0xfd, 0x07, 0x0a, 0x11, 0x4d, 0x42, 0x6f, 0x74, 0x53, 0x65, 0x72, 0x76, 0x65,
+	0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x32, 0x0a, 0x05, 0x4c, 0x6f, 0x67, 0x69,
+	0x6e, 0x12, 0x12, 0x2e, 0x6d, 0x62, 0x6f, 0x74, 0x2e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x13, 0x2e, 0x6d, 0x62, 0x6f, 0x74, 0x2e, 0x4c, 0x6f, 0x67,
+	0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4d, 0x0a, 0x0e,
 	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x12, 0x1b,
 	0x2e, 0x6d, 0x62, 0x6f, 0x74, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x75, 0x73, 0x74,
 	0x6f, 0x6d, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x6d, 0x62,
@@ -98,54 +102,58 @@ var file_service_proto_rawDesc = []byte{
 }
 
 var file_service_proto_goTypes = []any{
-	(*CreateCustomerRequest)(nil),             // 0: mbot.CreateCustomerRequest
-	(*GetCustomerRequest)(nil),                // 1: mbot.GetCustomerRequest
-	(*GetCustomersAllRequest)(nil),            // 2: mbot.GetCustomersAllRequest
-	(*UpdateCustomerRequest)(nil),             // 3: mbot.UpdateCustomerRequest
-	(*DeleteCustomerRequest)(nil),             // 4: mbot.DeleteCustomerRequest
-	(*CreateSubscriptionRequest)(nil),         // 5: mbot.CreateSubscriptionRequest
-	(*GetSubscriptionRequest)(nil),            // 6: mbot.GetSubscriptionRequest
-	(*GetSubscriptionsAllRequest)(nil),        // 7: mbot.GetSubscriptionsAllRequest
-	(*UpdateSubscriptionRequest)(nil),         // 8: mbot.UpdateSubscriptionRequest
-	(*DeleteSubscriptionRequest)(nil),         // 9: mbot.DeleteSubscriptionRequest
-	(*GetSubscriptionByCustomerRequest)(nil),  // 10: mbot.GetSubscriptionByCustomerRequest
-	(*CreateCustomerResponse)(nil),            // 11: mbot.CreateCustomerResponse
-	(*GetCustomerResponse)(nil),               // 12: mbot.GetCustomerResponse
-	(*GetCustomersAllResponse)(nil),           // 13: mbot.GetCustomersAllResponse
-	(*UpdateCustomerResponse)(nil),            // 14: mbot.UpdateCustomerResponse
-	(*DeleteCustomerResponse)(nil),            // 15: mbot.DeleteCustomerResponse
-	(*CreateSubscriptionResponse)(nil),        // 16: mbot.CreateSubscriptionResponse
-	(*GetSubscriptionResponse)(nil),           // 17: mbot.GetSubscriptionResponse
-	(*GetSubscriptionsAllResponse)(nil),       // 18: mbot.GetSubscriptionsAllResponse
-	(*UpdateSubscriptionResponse)(nil),        // 19: mbot.UpdateSubscriptionResponse
-	(*DeleteSubscriptionResponse)(nil),        // 20: mbot.DeleteSubscriptionResponse
-	(*GetSubscriptionByCustomerResponse)(nil), // 21: mbot.GetSubscriptionByCustomerResponse
+	(*LoginRequest)(nil),                      // 0: mbot.LoginRequest
+	(*CreateCustomerRequest)(nil),             // 1: mbot.CreateCustomerRequest
+	(*GetCustomerRequest)(nil),                // 2: mbot.GetCustomerRequest
+	(*GetCustomersAllRequest)(nil),            // 3: mbot.GetCustomersAllRequest
+	(*UpdateCustomerRequest)(nil),             // 4: mbot.UpdateCustomerRequest
+	(*DeleteCustomerRequest)(nil),             // 5: mbot.DeleteCustomerRequest
+	(*CreateSubscriptionRequest)(nil),         // 6: mbot.CreateSubscriptionRequest
+	(*GetSubscriptionRequest)(nil),            // 7: mbot.GetSubscriptionRequest
+	(*GetSubscriptionsAllRequest)(nil),        // 8: mbot.GetSubscriptionsAllRequest
+	(*UpdateSubscriptionRequest)(nil),         // 9: mbot.UpdateSubscriptionRequest
+	(*DeleteSubscriptionRequest)(nil),         // 10: mbot.DeleteSubscriptionRequest
+	(*GetSubscriptionByCustomerRequest)(nil),  // 11: mbot.GetSubscriptionByCustomerRequest
+	(*LoginResponse)(nil),                     // 12: mbot.LoginResponse
+	(*CreateCustomerResponse)(nil),            // 13: mbot.CreateCustomerResponse
+	(*GetCustomerResponse)(nil),               // 14: mbot.GetCustomerResponse
+	(*GetCustomersAllResponse)(nil),           // 15: mbot.GetCustomersAllResponse
+	(*UpdateCustomerResponse)(nil),            // 16: mbot.UpdateCustomerResponse
+	(*DeleteCustomerResponse)(nil),            // 17: mbot.DeleteCustomerResponse
+	(*CreateSubscriptionResponse)(nil),        // 18: mbot.CreateSubscriptionResponse
+	(*GetSubscriptionResponse)(nil),           // 19: mbot.GetSubscriptionResponse
+	(*GetSubscriptionsAllResponse)(nil),       // 20: mbot.GetSubscriptionsAllResponse
+	(*UpdateSubscriptionResponse)(nil),        // 21: mbot.UpdateSubscriptionResponse
+	(*DeleteSubscriptionResponse)(nil),        // 22: mbot.DeleteSubscriptionResponse
+	(*GetSubscriptionByCustomerResponse)(nil), // 23: mbot.GetSubscriptionByCustomerResponse
 }
 var file_service_proto_depIdxs = []int32{
-	0,  // 0: mbot.MBotServerService.CreateCustomer:input_type -> mbot.CreateCustomerRequest
-	1,  // 1: mbot.MBotServerService.GetCustomer:input_type -> mbot.GetCustomerRequest
-	2,  // 2: mbot.MBotServerService.GetCustomersAll:input_type -> mbot.GetCustomersAllRequest
-	3,  // 3: mbot.MBotServerService.UpdateCustomer:input_type -> mbot.UpdateCustomerRequest
-	4,  // 4: mbot.MBotServerService.DeleteCustomer:input_type -> mbot.DeleteCustomerRequest
-	5,  // 5: mbot.MBotServerService.CreateSubscription:input_type -> mbot.CreateSubscriptionRequest
-	6,  // 6: mbot.MBotServerService.GetSubscription:input_type -> mbot.GetSubscriptionRequest
-	7,  // 7: mbot.MBotServerService.GetSubscriptionsAll:input_type -> mbot.GetSubscriptionsAllRequest
-	8,  // 8: mbot.MBotServerService.UpdateSubscription:input_type -> mbot.UpdateSubscriptionRequest
-	9,  // 9: mbot.MBotServerService.DeleteSubscription:input_type -> mbot.DeleteSubscriptionRequest
-	10, // 10: mbot.MBotServerService.GetSubscriptionByCustomer:input_type -> mbot.GetSubscriptionByCustomerRequest
-	11, // 11: mbot.MBotServerService.CreateCustomer:output_type -> mbot.CreateCustomerResponse
-	12, // 12: mbot.MBotServerService.GetCustomer:output_type -> mbot.GetCustomerResponse
-	13, // 13: mbot.MBotServerService.GetCustomersAll:output_type -> mbot.GetCustomersAllResponse
-	14, // 14: mbot.MBotServerService.UpdateCustomer:output_type -> mbot.UpdateCustomerResponse
-	15, // 15: mbot.MBotServerService.DeleteCustomer:output_type -> mbot.DeleteCustomerResponse
-	16, // 16: mbot.MBotServerService.CreateSubscription:output_type -> mbot.CreateSubscriptionResponse
-	17, // 17: mbot.MBotServerService.GetSubscription:output_type -> mbot.GetSubscriptionResponse
-	18, // 18: mbot.MBotServerService.GetSubscriptionsAll:output_type -> mbot.GetSubscriptionsAllResponse
-	19, // 19: mbot.MBotServerService.UpdateSubscription:output_type -> mbot.UpdateSubscriptionResponse
-	20, // 20: mbot.MBotServerService.DeleteSubscription:output_type -> mbot.DeleteSubscriptionResponse
-	21, // 21: mbot.MBotServerService.GetSubscriptionByCustomer:output_type -> mbot.GetSubscriptionByCustomerResponse
-	11, // [11:22] is the sub-list for method output_type
-	0,  // [0:11] is the sub-list for method input_type
+	0,  // 0: mbot.MBotServerService.Login:input_type -> mbot.LoginRequest
+	1,  // 1: mbot.MBotServerService.CreateCustomer:input_type -> mbot.CreateCustomerRequest
+	2,  // 2: mbot.MBotServerService.GetCustomer:input_type -> mbot.GetCustomerRequest
+	3,  // 3: mbot.MBotServerService.GetCustomersAll:input_type -> mbot.GetCustomersAllRequest
+	4,  // 4: mbot.MBotServerService.UpdateCustomer:input_type -> mbot.UpdateCustomerRequest
+	5,  // 5: mbot.MBotServerService.DeleteCustomer:input_type -> mbot.DeleteCustomerRequest
+	6,  // 6: mbot.MBotServerService.CreateSubscription:input_type -> mbot.CreateSubscriptionRequest
+	7,  // 7: mbot.MBotServerService.GetSubscription:input_type -> mbot.GetSubscriptionRequest
+	8,  // 8: mbot.MBotServerService.GetSubscriptionsAll:input_type -> mbot.GetSubscriptionsAllRequest
+	9,  // 9: mbot.MBotServerService.UpdateSubscription:input_type -> mbot.UpdateSubscriptionRequest
+	10, // 10: mbot.MBotServerService.DeleteSubscription:input_type -> mbot.DeleteSubscriptionRequest
+	11, // 11: mbot.MBotServerService.GetSubscriptionByCustomer:input_type -> mbot.GetSubscriptionByCustomerRequest
+	12, // 12: mbot.MBotServerService.Login:output_type -> mbot.LoginResponse
+	13, // 13: mbot.MBotServerService.CreateCustomer:output_type -> mbot.CreateCustomerResponse
+	14, // 14: mbot.MBotServerService.GetCustomer:output_type -> mbot.GetCustomerResponse
+	15, // 15: mbot.MBotServerService.GetCustomersAll:output_type -> mbot.GetCustomersAllResponse
+	16, // 16: mbot.MBotServerService.UpdateCustomer:output_type -> mbot.UpdateCustomerResponse
+	17, // 17: mbot.MBotServerService.DeleteCustomer:output_type -> mbot.DeleteCustomerResponse
+	18, // 18: mbot.MBotServerService.CreateSubscription:output_type -> mbot.CreateSubscriptionResponse
+	19, // 19: mbot.MBotServerService.GetSubscription:output_type -> mbot.GetSubscriptionResponse
+	20, // 20: mbot.MBotServerService.GetSubscriptionsAll:output_type -> mbot.GetSubscriptionsAllResponse
+	21, // 21: mbot.MBotServerService.UpdateSubscription:output_type -> mbot.UpdateSubscriptionResponse
+	22, // 22: mbot.MBotServerService.DeleteSubscription:output_type -> mbot.DeleteSubscriptionResponse
+	23, // 23: mbot.MBotServerService.GetSubscriptionByCustomer:output_type -> mbot.GetSubscriptionByCustomerResponse
+	12, // [12:24] is the sub-list for method output_type
+	0,  // [0:12] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -159,6 +167,7 @@ func file_service_proto_init() {
 	file_customer_proto_init()
 	file_stats_proto_init()
 	file_subscription_proto_init()
+	file_auth_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

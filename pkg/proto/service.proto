@@ -5,8 +5,11 @@ package mbot;
 import "customer.proto";
 import "stats.proto";
 import "subscription.proto";
+import "auth.proto";
 
 service MBotServerService {
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+
   rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse) {}
   rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse) {}
   rpc GetCustomersAll(GetCustomersAllRequest) returns (GetCustomersAllResponse) {}

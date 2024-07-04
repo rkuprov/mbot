@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/rkuprov/mbot/pkg/cfg"
-	"github.com/rkuprov/mbot/pkg/store"
 )
 
 func main() {
@@ -14,12 +13,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	db, err := store.New(configs.Postgres)
-	if err != nil {
-		panic(err)
-	}
 
-	SetupRoutes(mux, db)
+	SetupRoutes(mux, configs)
 
 	fmt.Println("Starting MBOT service")
 	err = http.ListenAndServe("localhost:8080", mux)

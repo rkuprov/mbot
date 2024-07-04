@@ -33,10 +33,10 @@ func handleStoreError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, store.ErrSubscriptionNotFound):
 		http.Error(w, err.Error(), http.StatusNotFound)
-	case errors.Is(err, store.ErrSubscriptionExpired):
+	case errors.Is(err, store.ErrSubscriptionExpired),
+		errors.Is(err, store.ErrSubscriptionNotActive):
 		http.Error(w, err.Error(), http.StatusForbidden)
-	case errors.Is(err, store.ErrSubscriptionNotActive):
-		http.Error(w, err.Error(), http.StatusForbidden)
+	case errors.Is(err, store.ErrSubscriptionCanceled):
 	default:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

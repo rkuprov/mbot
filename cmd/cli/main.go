@@ -15,7 +15,7 @@ import (
 )
 
 type Options struct {
-	GetToken auth.Cmd   `cmd:"" help:"Authenticate a user and grant them a session token"`
+	GetToken auth.Cmd   `cmd:"" help:"authenticate a user and grant them a session token"`
 	Add      add.Cmd    `cmd:"" help:"Add various entities to the database"`
 	View     view.Cmd   `cmd:"" help:"Examine various entities in the database"`
 	Update   update.Cmd `cmd:"" help:"Update various entities in the database"`
