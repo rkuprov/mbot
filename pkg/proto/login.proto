@@ -1,11 +1,16 @@
 syntax = "proto3";
 package mbot;
 
+message SessionToken {
+  string user_id = 1;
+  string token = 2;
+
+}
 message LoginRequest{
   string username = 1;
   string password = 2;
 }
 
 message LoginResponse {
-  string token = 1;
+  SessionToken token = 1;
 }
