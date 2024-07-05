@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -30,20 +31,22 @@ func (a *Auth) ConfirmAndRotateToken(ctx context.Context, token SessionToken) (S
 		return SessionToken{}, err
 	}
 	defer tx.Rollback(ctx)
-	var count int
 	err = tx.QueryRow(ctx, `
 	SELECT
-	    count(*)
+		expires_at
 	FROM session 
 	WHERE token = $1 and is_valid = true 
-	`, token.Token).Scan(&count)
+	`, token.Token).Scan(&token.ValidUntil)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return SessionToken{}, ErrTokenNotFound
 		}
 		return SessionToken{}, err
 	}
-	if time.Now().After(token.ValidUntil) {
+	if time.Now().UTC().After(token.ValidUntil) {
+		fmt.Println("token expired")
+		fmt.Println(time.Now().Local().String())
+		fmt.Println(token.ValidUntil.Local().String())
 		return SessionToken{}, ErrTokenExpired
 	}
 	_, err = tx.Exec(ctx, `
@@ -84,6 +87,6 @@ func newSessionToken(id string) SessionToken {
 		UserID:     id,
 		Token:      uuid.New().String(),
 		IsValid:    true,
-		ValidUntil: time.Now().Add(30 * time.Minute),
+		ValidUntil: time.Now().UTC().Add(30 * time.Minute),
 	}
 }
