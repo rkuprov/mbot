@@ -14,3 +14,7 @@ message LoginRequest{
 message LoginResponse {
   SessionToken token = 1;
 }
+
+message LogoutRequest{}
+
+message LogoutResponse{}

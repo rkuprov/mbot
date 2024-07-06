@@ -8,8 +8,6 @@ import "subscription.proto";
 import "auth.proto";
 
 service MBotServerService {
-  rpc Login(LoginRequest) returns (LoginResponse) {}
-
   rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse) {}
   rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse) {}
   rpc GetCustomersAll(GetCustomersAllRequest) returns (GetCustomersAllResponse) {}
@@ -26,4 +24,10 @@ service MBotServerService {
 //  rpc GetStatsByCustomer(GetStatsByCustomerRequest) returns (GetStatsByCustomerResponse) {}
 //  rpc GetStatsBySubscription(GetStatsBySubscriptionRequest) returns (GetStatsBySubscriptionResponse) {}
 //  rpc GetStatsAll(GetStatsAllRequest) returns (GetStatsAllResponse) {}
+}
+
+service MbotAuthServerService {
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+//  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {}
 }
