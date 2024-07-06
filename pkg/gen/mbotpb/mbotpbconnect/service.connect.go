@@ -71,6 +71,9 @@ const (
 	// MbotAuthServerServiceLoginProcedure is the fully-qualified name of the MbotAuthServerService's
 	// Login RPC.
 	MbotAuthServerServiceLoginProcedure = "/mbot.MbotAuthServerService/Login"
+	// MbotAuthServerServiceRegisterProcedure is the fully-qualified name of the MbotAuthServerService's
+	// Register RPC.
+	MbotAuthServerServiceRegisterProcedure = "/mbot.MbotAuthServerService/Register"
 	// MbotAuthServerServiceLogoutProcedure is the fully-qualified name of the MbotAuthServerService's
 	// Logout RPC.
 	MbotAuthServerServiceLogoutProcedure = "/mbot.MbotAuthServerService/Logout"
@@ -92,6 +95,7 @@ var (
 	mBotServerServiceGetSubscriptionByCustomerMethodDescriptor = mBotServerServiceServiceDescriptor.Methods().ByName("GetSubscriptionByCustomer")
 	mbotAuthServerServiceServiceDescriptor                     = mbotpb.File_service_proto.Services().ByName("MbotAuthServerService")
 	mbotAuthServerServiceLoginMethodDescriptor                 = mbotAuthServerServiceServiceDescriptor.Methods().ByName("Login")
+	mbotAuthServerServiceRegisterMethodDescriptor              = mbotAuthServerServiceServiceDescriptor.Methods().ByName("Register")
 	mbotAuthServerServiceLogoutMethodDescriptor                = mbotAuthServerServiceServiceDescriptor.Methods().ByName("Logout")
 )
 
@@ -426,7 +430,7 @@ func (UnimplementedMBotServerServiceHandler) GetSubscriptionByCustomer(context.C
 // MbotAuthServerServiceClient is a client for the mbot.MbotAuthServerService service.
 type MbotAuthServerServiceClient interface {
 	Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error)
-	// rpc Register(RegisterRequest) returns (RegisterResponse) {}
+	Register(context.Context, *connect.Request[mbotpb.RegisterRequest]) (*connect.Response[mbotpb.RegisterResponse], error)
 	Logout(context.Context, *connect.Request[mbotpb.LogoutRequest]) (*connect.Response[mbotpb.LogoutResponse], error)
 }
 
@@ -446,6 +450,12 @@ func NewMbotAuthServerServiceClient(httpClient connect.HTTPClient, baseURL strin
 			connect.WithSchema(mbotAuthServerServiceLoginMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		register: connect.NewClient[mbotpb.RegisterRequest, mbotpb.RegisterResponse](
+			httpClient,
+			baseURL+MbotAuthServerServiceRegisterProcedure,
+			connect.WithSchema(mbotAuthServerServiceRegisterMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		logout: connect.NewClient[mbotpb.LogoutRequest, mbotpb.LogoutResponse](
 			httpClient,
 			baseURL+MbotAuthServerServiceLogoutProcedure,
@@ -457,13 +467,19 @@ func NewMbotAuthServerServiceClient(httpClient connect.HTTPClient, baseURL strin
 
 // mbotAuthServerServiceClient implements MbotAuthServerServiceClient.
 type mbotAuthServerServiceClient struct {
-	login  *connect.Client[mbotpb.LoginRequest, mbotpb.LoginResponse]
-	logout *connect.Client[mbotpb.LogoutRequest, mbotpb.LogoutResponse]
+	login    *connect.Client[mbotpb.LoginRequest, mbotpb.LoginResponse]
+	register *connect.Client[mbotpb.RegisterRequest, mbotpb.RegisterResponse]
+	logout   *connect.Client[mbotpb.LogoutRequest, mbotpb.LogoutResponse]
 }
 
 // Login calls mbot.MbotAuthServerService.Login.
 func (c *mbotAuthServerServiceClient) Login(ctx context.Context, req *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error) {
 	return c.login.CallUnary(ctx, req)
+}
+
+// Register calls mbot.MbotAuthServerService.Register.
+func (c *mbotAuthServerServiceClient) Register(ctx context.Context, req *connect.Request[mbotpb.RegisterRequest]) (*connect.Response[mbotpb.RegisterResponse], error) {
+	return c.register.CallUnary(ctx, req)
 }
 
 // Logout calls mbot.MbotAuthServerService.Logout.
@@ -474,7 +490,7 @@ func (c *mbotAuthServerServiceClient) Logout(ctx context.Context, req *connect.R
 // MbotAuthServerServiceHandler is an implementation of the mbot.MbotAuthServerService service.
 type MbotAuthServerServiceHandler interface {
 	Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error)
-	// rpc Register(RegisterRequest) returns (RegisterResponse) {}
+	Register(context.Context, *connect.Request[mbotpb.RegisterRequest]) (*connect.Response[mbotpb.RegisterResponse], error)
 	Logout(context.Context, *connect.Request[mbotpb.LogoutRequest]) (*connect.Response[mbotpb.LogoutResponse], error)
 }
 
@@ -490,6 +506,12 @@ func NewMbotAuthServerServiceHandler(svc MbotAuthServerServiceHandler, opts ...c
 		connect.WithSchema(mbotAuthServerServiceLoginMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	mbotAuthServerServiceRegisterHandler := connect.NewUnaryHandler(
+		MbotAuthServerServiceRegisterProcedure,
+		svc.Register,
+		connect.WithSchema(mbotAuthServerServiceRegisterMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	mbotAuthServerServiceLogoutHandler := connect.NewUnaryHandler(
 		MbotAuthServerServiceLogoutProcedure,
 		svc.Logout,
@@ -500,6 +522,8 @@ func NewMbotAuthServerServiceHandler(svc MbotAuthServerServiceHandler, opts ...c
 		switch r.URL.Path {
 		case MbotAuthServerServiceLoginProcedure:
 			mbotAuthServerServiceLoginHandler.ServeHTTP(w, r)
+		case MbotAuthServerServiceRegisterProcedure:
+			mbotAuthServerServiceRegisterHandler.ServeHTTP(w, r)
 		case MbotAuthServerServiceLogoutProcedure:
 			mbotAuthServerServiceLogoutHandler.ServeHTTP(w, r)
 		default:
@@ -513,6 +537,10 @@ type UnimplementedMbotAuthServerServiceHandler struct{}
 
 func (UnimplementedMbotAuthServerServiceHandler) Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MbotAuthServerService.Login is not implemented"))
+}
+
+func (UnimplementedMbotAuthServerServiceHandler) Register(context.Context, *connect.Request[mbotpb.RegisterRequest]) (*connect.Response[mbotpb.RegisterResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MbotAuthServerService.Register is not implemented"))
 }
 
 func (UnimplementedMbotAuthServerServiceHandler) Logout(context.Context, *connect.Request[mbotpb.LogoutRequest]) (*connect.Response[mbotpb.LogoutResponse], error) {

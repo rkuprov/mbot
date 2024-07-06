@@ -17,13 +17,15 @@ func (m *MBot) Login(ctx context.Context, req *connect.Request[mbotpb.LoginReque
 	if err != nil {
 		return nil, err
 	}
-	return &connect.Response[mbotpb.LoginResponse]{
+
+	resp := connect.Response[mbotpb.LoginResponse]{
 		Msg: &mbotpb.LoginResponse{
-			Token: &mbotpb.SessionToken{
-				Value: token,
-			},
+			Ok: true,
 		},
-	}, nil
+	}
+	resp.Header().Set(auth.HeaderSessionToken, token)
+
+	return &resp, nil
 }
 
 func (m *MBot) Logout(ctx context.Context, req *connect.Request[mbotpb.LogoutRequest]) (

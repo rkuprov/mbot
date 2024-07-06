@@ -9,15 +9,22 @@ message SessionToken {
   google.protobuf.Timestamp expiration = 2;
 
 }
+
 message LoginRequest{
   string username = 1;
   string password = 2;
 }
-
 message LoginResponse {
-  SessionToken token = 1;
+  bool ok = 1;
 }
 
 message LogoutRequest{}
-
 message LogoutResponse{}
+
+message RegisterRequest{
+  string username = 1;
+  string password = 2;
+}
+message RegisterResponse{
+  bool ok = 1;
+}

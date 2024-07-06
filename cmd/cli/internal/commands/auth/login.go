@@ -34,7 +34,7 @@ func (c *LoginCmd) Run(ctx context.Context, client mbotpbconnect.MbotAuthServerS
 		return err
 	}
 	defer f.Close()
-	_, err = fmt.Fprintf(f, "%s", resp.Msg.Token.GetValue())
+	_, err = fmt.Fprintf(f, "%s", resp.Header().Get(auth.HeaderSessionToken))
 
 	ui.Tabular(ui.PrintCfg{
 		Title: "Login Successful",
