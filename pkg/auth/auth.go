@@ -16,60 +16,54 @@ const (
 	SessionFile        = ".session"
 )
 
-func (a *Auth) Login(ctx context.Context, username, password string) (SessionToken, error) {
-	id, err := a.authenticate(ctx, username, password)
+func (a *Auth) Login(ctx context.Context, username, password string) (string, error) {
+	err := a.authenticate(ctx, username, password)
 	if err != nil {
-		return SessionToken{}, err
+		return "", err
 	}
-	token := newSessionToken(id)
+	token := newSessionToken()
 
 	_, err = a.pg.Exec(ctx, `
 		INSERT INTO session (
-			user_id,
-			token,
-			is_valid,
-			expires_at
-		) VALUES ($1, $2, $3, $4)
+			token
+		) VALUES ($1)
 	`,
-		token.UserID,
-		token.Token,
-		token.IsValid,
-		token.ValidUntil)
-	if err != nil {
-		return SessionToken{}, err
-	}
-
-	return token, nil
-}
-
-func (a *Auth) authenticate(ctx context.Context, inUsrName, password string) (string, error) {
-	var id, username, pw string
-	dbErr := a.pg.QueryRow(ctx, `
-	SELECT
-	id,
-	username,
-	password
-	FROM users
-	WHERE username = $1
-	`, inUsrName).Scan(&id, &username, &pw)
-	if dbErr != nil && !errors.Is(dbErr, pgx.ErrNoRows) {
-		return "", dbErr
-	}
-	dbPwHash, err := stringToHash(pw)
+		token.Value,
+	)
 	if err != nil {
 		return "", err
 	}
 
-	switch {
-	case username != inUsrName:
-		return "", ErrInvalidUsername
-	case bcrypt.CompareHashAndPassword(dbPwHash, []byte(password)) != nil:
-		return "", ErrInvalidPassword
-	case errors.Is(dbErr, pgx.ErrNoRows):
-		return "", ErrUserNotFound
+	return token.Value, nil
+}
+
+func (a *Auth) authenticate(ctx context.Context, inUsrName, password string) error {
+	var username, pw string
+	dbErr := a.pg.QueryRow(ctx, `
+	SELECT
+	username,
+	password
+	FROM users
+	WHERE username = $1
+	`, inUsrName).Scan(&username, &pw)
+	if dbErr != nil && !errors.Is(dbErr, pgx.ErrNoRows) {
+		return dbErr
+	}
+	dbPwHash, err := stringToHash(pw)
+	if err != nil {
+		return err
 	}
 
-	return id, nil
+	switch {
+	case username != inUsrName:
+		return ErrInvalidUsername
+	case bcrypt.CompareHashAndPassword(dbPwHash, []byte(password)) != nil:
+		return ErrInvalidPassword
+	case errors.Is(dbErr, pgx.ErrNoRows):
+		return ErrUserNotFound
+	}
+
+	return nil
 }
 
 func (a *Auth) NewUser(ctx context.Context, username, password string) error {

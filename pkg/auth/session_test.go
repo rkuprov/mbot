@@ -22,5 +22,5 @@ func TestAuth_ConfirmAndRotateToken(t *testing.T) {
 	require.NoError(t, err)
 	token2, err := auth.ConfirmAndRotateToken(ctx, token)
 	assert.NoError(t, err)
-	assert.NotEqual(t, token.Token, token2.Token)
+	assert.NotEqual(t, token, token2)
 }
