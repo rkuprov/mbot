@@ -22,6 +22,5 @@ func ToSubscriptionDates(start, end time.Time, duration *int) (time.Time, time.T
 		return time.Time{}, time.Time{}, fmt.Errorf("start date cannot be after end date")
 	}
 
-	fmt.Println(endDate.Format("2006-01-02"))
 	return start, endDate, nil
 }

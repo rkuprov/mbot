@@ -20,8 +20,7 @@ func (m *MBot) Login(ctx context.Context, req *connect.Request[mbotpb.LoginReque
 	return &connect.Response[mbotpb.LoginResponse]{
 		Msg: &mbotpb.LoginResponse{
 			Token: &mbotpb.SessionToken{
-				UserId: token.UserID,
-				Token:  token.Token,
+				Value: token,
 			},
 		},
 	}, nil

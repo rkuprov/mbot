@@ -16,30 +16,27 @@ const (
 	SessionFile        = ".session"
 )
 
-func (a *Auth) Login(ctx context.Context, username, password string) (SessionToken, error) {
+func (a *Auth) Login(ctx context.Context, username, password string) (string, error) {
 	id, err := a.authenticate(ctx, username, password)
 	if err != nil {
-		return SessionToken{}, err
+		return "", err
 	}
-	token := newSessionToken(id)
+	token := newSessionToken()
 
 	_, err = a.pg.Exec(ctx, `
 		INSERT INTO session (
-			user_id,
-			token,
-			is_valid,
-			expires_at
-		) VALUES ($1, $2, $3, $4)
+			token
+		) VALUES ($1)
 	`,
-		token.UserID,
-		token.Token,
-		token.IsValid,
-		token.ValidUntil)
+		id,
+		token.Value,
+		token.Expiration.AsTime(),
+	)
 	if err != nil {
-		return SessionToken{}, err
+		return "", err
 	}
 
-	return token, nil
+	return token.Value, nil
 }
 
 func (a *Auth) authenticate(ctx context.Context, inUsrName, password string) (string, error) {

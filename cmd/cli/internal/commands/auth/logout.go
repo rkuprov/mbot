@@ -3,7 +3,6 @@ package auth
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"os"
 
@@ -32,12 +31,7 @@ func (c *LogoutCmd) Run(ctx context.Context, client mbotpbconnect.MbotAuthServer
 	if err != nil {
 		return err
 	}
-	secrets := bytes.Split(bytes.TrimSpace(bts), []byte("\n"))
-	if len(secrets) != 2 {
-		return fmt.Errorf("expected 2 secrets, got %d", len(secrets))
-	}
-	req.Header().Set(auth.HeaderUserID, string(secrets[0]))
-	req.Header().Set(auth.HeaderSessionToken, string(secrets[1]))
+	req.Header().Set(auth.HeaderSessionToken, string(bytes.TrimSpace(bts)))
 
 	_, err = client.Logout(ctx, &req)
 	if err != nil {
