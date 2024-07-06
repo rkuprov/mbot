@@ -14,7 +14,7 @@ import (
 func WithTokenInterceptor() connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			req, err := InsertSessionToken(req)
+			req, err := insertSessionToken(req)
 			if err != nil {
 				return nil, err
 			}
@@ -25,8 +25,7 @@ func WithTokenInterceptor() connect.UnaryInterceptorFunc {
 			}
 
 			err = updateSessionToken(
-				req.Header().Get(auth.HeaderUserID),
-				req.Header().Get(auth.HeaderSessionToken),
+				resp.Header().Get(auth.HeaderSessionToken),
 			)
 			if err != nil {
 				return nil, err
@@ -37,7 +36,7 @@ func WithTokenInterceptor() connect.UnaryInterceptorFunc {
 	}
 }
 
-func InsertSessionToken(req connect.AnyRequest) (connect.AnyRequest, error) {
+func insertSessionToken(req connect.AnyRequest) (connect.AnyRequest, error) {
 	f, err := os.OpenFile(auth.SessionFile, os.O_RDWR, 0644)
 	if err != nil {
 		return nil, err
@@ -53,7 +52,7 @@ func InsertSessionToken(req connect.AnyRequest) (connect.AnyRequest, error) {
 	return req, nil
 }
 
-func updateSessionToken(id, token string) error {
+func updateSessionToken(token string) error {
 	f, err := os.OpenFile(auth.SessionFile, os.O_RDWR, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)

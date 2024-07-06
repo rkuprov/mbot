@@ -7,7 +7,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 )
@@ -71,7 +70,6 @@ func (a *Auth) ConfirmAndRotateToken(ctx context.Context, tokenVal string) (*mbo
 	) VALUES ($1)
 	`,
 		newToken.Value,
-		newToken.Expiration.AsTime(),
 	)
 	if err != nil {
 		return nil, err
@@ -86,7 +84,6 @@ func (a *Auth) ConfirmAndRotateToken(ctx context.Context, tokenVal string) (*mbo
 
 func newSessionToken() *mbotpb.SessionToken {
 	return &mbotpb.SessionToken{
-		Value:      uuid.New().String(),
-		Expiration: timestamppb.New(time.Now().UTC().Add(time.Hour * 24)),
+		Value: uuid.New().String(),
 	}
 }

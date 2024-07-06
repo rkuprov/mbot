@@ -17,7 +17,7 @@ const (
 )
 
 func (a *Auth) Login(ctx context.Context, username, password string) (string, error) {
-	id, err := a.authenticate(ctx, username, password)
+	err := a.authenticate(ctx, username, password)
 	if err != nil {
 		return "", err
 	}
@@ -28,9 +28,7 @@ func (a *Auth) Login(ctx context.Context, username, password string) (string, er
 			token
 		) VALUES ($1)
 	`,
-		id,
 		token.Value,
-		token.Expiration.AsTime(),
 	)
 	if err != nil {
 		return "", err
@@ -39,34 +37,33 @@ func (a *Auth) Login(ctx context.Context, username, password string) (string, er
 	return token.Value, nil
 }
 
-func (a *Auth) authenticate(ctx context.Context, inUsrName, password string) (string, error) {
-	var id, username, pw string
+func (a *Auth) authenticate(ctx context.Context, inUsrName, password string) error {
+	var username, pw string
 	dbErr := a.pg.QueryRow(ctx, `
 	SELECT
-	id,
 	username,
 	password
 	FROM users
 	WHERE username = $1
-	`, inUsrName).Scan(&id, &username, &pw)
+	`, inUsrName).Scan(&username, &pw)
 	if dbErr != nil && !errors.Is(dbErr, pgx.ErrNoRows) {
-		return "", dbErr
+		return dbErr
 	}
 	dbPwHash, err := stringToHash(pw)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	switch {
 	case username != inUsrName:
-		return "", ErrInvalidUsername
+		return ErrInvalidUsername
 	case bcrypt.CompareHashAndPassword(dbPwHash, []byte(password)) != nil:
-		return "", ErrInvalidPassword
+		return ErrInvalidPassword
 	case errors.Is(dbErr, pgx.ErrNoRows):
-		return "", ErrUserNotFound
+		return ErrUserNotFound
 	}
 
-	return id, nil
+	return nil
 }
 
 func (a *Auth) NewUser(ctx context.Context, username, password string) error {

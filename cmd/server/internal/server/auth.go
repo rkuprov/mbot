@@ -41,3 +41,21 @@ func (m *MBot) Logout(ctx context.Context, req *connect.Request[mbotpb.LogoutReq
 
 	return &connect.Response[mbotpb.LogoutResponse]{}, nil
 }
+
+func (m *MBot) Register(ctx context.Context, req *connect.Request[mbotpb.RegisterRequest]) (
+	*connect.Response[mbotpb.RegisterResponse],
+	error,
+) {
+	err := m.auth.NewUser(ctx, req.Msg.GetUsername(), req.Msg.GetPassword())
+	if err != nil {
+		return nil, err
+	}
+
+	resp := connect.Response[mbotpb.RegisterResponse]{
+		Msg: &mbotpb.RegisterResponse{
+			Ok: true,
+		},
+	}
+
+	return &resp, nil
+}
