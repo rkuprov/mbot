@@ -2,3 +2,4 @@
 *.db
 deployment/*.json
 *.json
+*.session
