@@ -29,5 +29,5 @@ service MBotServerService {
 service MbotAuthServerService {
   rpc Login(LoginRequest) returns (LoginResponse) {}
 //  rpc Register(RegisterRequest) returns (RegisterResponse) {}
-//  rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {}
 }

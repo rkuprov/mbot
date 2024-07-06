@@ -17,11 +17,12 @@ import (
 )
 
 type Options struct {
-	Login  auth.LoginCmd `cmd:"" help:"authenticate a user and grant them a session token"`
-	Add    add.Cmd       `cmd:"" help:"Add various entities to the database"`
-	View   view.Cmd      `cmd:"" help:"Examine various entities in the database"`
-	Update update.Cmd    `cmd:"" help:"Update various entities in the database"`
-	Delete delete.Cmd    `cmd:"" help:"Delete various entities in the database"`
+	Login  auth.LoginCmd  `cmd:"" help:"authenticate a user and grant them a session token"`
+	Logout auth.LogoutCmd `cmd:"" help:"revoke a user's session token"`
+	Add    add.Cmd        `cmd:"" help:"Add various entities to the database"`
+	View   view.Cmd       `cmd:"" help:"Examine various entities in the database"`
+	Update update.Cmd     `cmd:"" help:"Update various entities in the database"`
+	Delete delete.Cmd     `cmd:"" help:"Delete various entities in the database"`
 }
 
 func main() {

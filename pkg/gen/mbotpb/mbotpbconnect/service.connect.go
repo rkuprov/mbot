@@ -71,6 +71,9 @@ const (
 	// MbotAuthServerServiceLoginProcedure is the fully-qualified name of the MbotAuthServerService's
 	// Login RPC.
 	MbotAuthServerServiceLoginProcedure = "/mbot.MbotAuthServerService/Login"
+	// MbotAuthServerServiceLogoutProcedure is the fully-qualified name of the MbotAuthServerService's
+	// Logout RPC.
+	MbotAuthServerServiceLogoutProcedure = "/mbot.MbotAuthServerService/Logout"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -89,6 +92,7 @@ var (
 	mBotServerServiceGetSubscriptionByCustomerMethodDescriptor = mBotServerServiceServiceDescriptor.Methods().ByName("GetSubscriptionByCustomer")
 	mbotAuthServerServiceServiceDescriptor                     = mbotpb.File_service_proto.Services().ByName("MbotAuthServerService")
 	mbotAuthServerServiceLoginMethodDescriptor                 = mbotAuthServerServiceServiceDescriptor.Methods().ByName("Login")
+	mbotAuthServerServiceLogoutMethodDescriptor                = mbotAuthServerServiceServiceDescriptor.Methods().ByName("Logout")
 )
 
 // MBotServerServiceClient is a client for the mbot.MBotServerService service.
@@ -422,6 +426,8 @@ func (UnimplementedMBotServerServiceHandler) GetSubscriptionByCustomer(context.C
 // MbotAuthServerServiceClient is a client for the mbot.MbotAuthServerService service.
 type MbotAuthServerServiceClient interface {
 	Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error)
+	// rpc Register(RegisterRequest) returns (RegisterResponse) {}
+	Logout(context.Context, *connect.Request[mbotpb.LogoutRequest]) (*connect.Response[mbotpb.LogoutResponse], error)
 }
 
 // NewMbotAuthServerServiceClient constructs a client for the mbot.MbotAuthServerService service. By
@@ -440,12 +446,19 @@ func NewMbotAuthServerServiceClient(httpClient connect.HTTPClient, baseURL strin
 			connect.WithSchema(mbotAuthServerServiceLoginMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		logout: connect.NewClient[mbotpb.LogoutRequest, mbotpb.LogoutResponse](
+			httpClient,
+			baseURL+MbotAuthServerServiceLogoutProcedure,
+			connect.WithSchema(mbotAuthServerServiceLogoutMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // mbotAuthServerServiceClient implements MbotAuthServerServiceClient.
 type mbotAuthServerServiceClient struct {
-	login *connect.Client[mbotpb.LoginRequest, mbotpb.LoginResponse]
+	login  *connect.Client[mbotpb.LoginRequest, mbotpb.LoginResponse]
+	logout *connect.Client[mbotpb.LogoutRequest, mbotpb.LogoutResponse]
 }
 
 // Login calls mbot.MbotAuthServerService.Login.
@@ -453,9 +466,16 @@ func (c *mbotAuthServerServiceClient) Login(ctx context.Context, req *connect.Re
 	return c.login.CallUnary(ctx, req)
 }
 
+// Logout calls mbot.MbotAuthServerService.Logout.
+func (c *mbotAuthServerServiceClient) Logout(ctx context.Context, req *connect.Request[mbotpb.LogoutRequest]) (*connect.Response[mbotpb.LogoutResponse], error) {
+	return c.logout.CallUnary(ctx, req)
+}
+
 // MbotAuthServerServiceHandler is an implementation of the mbot.MbotAuthServerService service.
 type MbotAuthServerServiceHandler interface {
 	Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error)
+	// rpc Register(RegisterRequest) returns (RegisterResponse) {}
+	Logout(context.Context, *connect.Request[mbotpb.LogoutRequest]) (*connect.Response[mbotpb.LogoutResponse], error)
 }
 
 // NewMbotAuthServerServiceHandler builds an HTTP handler from the service implementation. It
@@ -470,10 +490,18 @@ func NewMbotAuthServerServiceHandler(svc MbotAuthServerServiceHandler, opts ...c
 		connect.WithSchema(mbotAuthServerServiceLoginMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	mbotAuthServerServiceLogoutHandler := connect.NewUnaryHandler(
+		MbotAuthServerServiceLogoutProcedure,
+		svc.Logout,
+		connect.WithSchema(mbotAuthServerServiceLogoutMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/mbot.MbotAuthServerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case MbotAuthServerServiceLoginProcedure:
 			mbotAuthServerServiceLoginHandler.ServeHTTP(w, r)
+		case MbotAuthServerServiceLogoutProcedure:
+			mbotAuthServerServiceLogoutHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -485,4 +513,8 @@ type UnimplementedMbotAuthServerServiceHandler struct{}
 
 func (UnimplementedMbotAuthServerServiceHandler) Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MbotAuthServerService.Login is not implemented"))
+}
+
+func (UnimplementedMbotAuthServerServiceHandler) Logout(context.Context, *connect.Request[mbotpb.LogoutRequest]) (*connect.Response[mbotpb.LogoutResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MbotAuthServerService.Logout is not implemented"))
 }

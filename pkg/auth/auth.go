@@ -10,7 +10,10 @@ import (
 )
 
 const (
-	passwordHashCost = 10
+	passwordHashCost   = 10
+	HeaderSessionToken = "mbot-session-token"
+	HeaderUserID       = "mbot-user-id"
+	SessionFile        = ".session"
 )
 
 func (a *Auth) Login(ctx context.Context, username, password string) (SessionToken, error) {
@@ -92,4 +95,30 @@ func stringToHash(s string) ([]byte, error) {
 }
 func hashToString(h []byte) string {
 	return base64.URLEncoding.EncodeToString(h)
+}
+
+func (a *Auth) Logout(ctx context.Context, token SessionToken) error {
+	var present bool
+	err := a.pg.QueryRow(ctx, `
+	SELECT
+	EXISTS (
+		SELECT 1
+		FROM session
+		WHERE token = $1)
+	`, token.Token).Scan(&present)
+	if err != nil {
+		return err
+	}
+	if !present {
+		return ErrTokenNotFound
+	}
+
+	_, err = a.pg.Exec(ctx, `
+	TRUNCATE TABLE session
+	`)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

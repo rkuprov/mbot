@@ -8,8 +8,8 @@ import (
 	"connectrpc.com/connect"
 	"github.com/jedib0t/go-pretty/v6/table"
 
-	"github.com/rkuprov/mbot/cmd/cli/internal/middleware"
 	"github.com/rkuprov/mbot/cmd/cli/internal/ui"
+	"github.com/rkuprov/mbot/pkg/auth"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 )
@@ -29,7 +29,7 @@ func (c *LoginCmd) Run(ctx context.Context, client mbotpbconnect.MbotAuthServerS
 	if err != nil {
 		return err
 	}
-	f, err := os.Create(middleware.SessionFile)
+	f, err := os.Create(auth.SessionFile)
 	if err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/rkuprov/mbot/pkg/auth"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 )
 
@@ -24,4 +25,18 @@ func (m *MBot) Login(ctx context.Context, req *connect.Request[mbotpb.LoginReque
 			},
 		},
 	}, nil
+}
+
+func (m *MBot) Logout(ctx context.Context, req *connect.Request[mbotpb.LogoutRequest]) (
+	*connect.Response[mbotpb.LogoutResponse],
+	error,
+) {
+	err := m.auth.Logout(ctx, auth.SessionToken{
+		Token: req.Header().Get(auth.HeaderSessionToken),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[mbotpb.LogoutResponse]{}, nil
 }

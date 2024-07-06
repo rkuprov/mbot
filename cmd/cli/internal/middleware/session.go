@@ -8,18 +8,14 @@ import (
 	"os"
 
 	"connectrpc.com/connect"
-)
 
-const (
-	HeaderSessionToken = "mbot-session-token"
-	HeaderUserID       = "mbot-user-id"
-	SessionFile        = ".session"
+	"github.com/rkuprov/mbot/pkg/auth"
 )
 
 func WithTokenInterceptor() connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			req, err := insertSessionToken(req)
+			req, err := InsertSessionToken(req)
 			if err != nil {
 				return nil, err
 			}
@@ -30,8 +26,8 @@ func WithTokenInterceptor() connect.UnaryInterceptorFunc {
 			}
 
 			err = updateSessionToken(
-				req.Header().Get(HeaderUserID),
-				req.Header().Get(HeaderSessionToken),
+				req.Header().Get(auth.HeaderUserID),
+				req.Header().Get(auth.HeaderSessionToken),
 			)
 			if err != nil {
 				return nil, err
@@ -42,8 +38,8 @@ func WithTokenInterceptor() connect.UnaryInterceptorFunc {
 	}
 }
 
-func insertSessionToken(req connect.AnyRequest) (connect.AnyRequest, error) {
-	f, err := os.OpenFile(SessionFile, os.O_RDWR, 0644)
+func InsertSessionToken(req connect.AnyRequest) (connect.AnyRequest, error) {
+	f, err := os.OpenFile(auth.SessionFile, os.O_RDWR, 0644)
 	if err != nil {
 		return nil, err
 	}
@@ -57,14 +53,14 @@ func insertSessionToken(req connect.AnyRequest) (connect.AnyRequest, error) {
 		return nil, fmt.Errorf("expected 2 secrets, got %d", len(secrets))
 	}
 
-	req.Header().Set(HeaderUserID, string(secrets[0]))
-	req.Header().Set(HeaderSessionToken, string(secrets[1]))
+	req.Header().Set(auth.HeaderUserID, string(secrets[0]))
+	req.Header().Set(auth.HeaderSessionToken, string(secrets[1]))
 
 	return req, nil
 }
 
 func updateSessionToken(id, token string) error {
-	f, err := os.OpenFile(SessionFile, os.O_RDWR, 0644)
+	f, err := os.OpenFile(auth.SessionFile, os.O_RDWR, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
 	}
