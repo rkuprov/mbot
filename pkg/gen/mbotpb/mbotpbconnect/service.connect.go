@@ -23,6 +23,8 @@ const _ = connect.IsAtLeastVersion1_13_0
 const (
 	// MBotServerServiceName is the fully-qualified name of the MBotServerService service.
 	MBotServerServiceName = "mbot.MBotServerService"
+	// MbotAuthServerServiceName is the fully-qualified name of the MbotAuthServerService service.
+	MbotAuthServerServiceName = "mbot.MbotAuthServerService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,8 +35,6 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// MBotServerServiceLoginProcedure is the fully-qualified name of the MBotServerService's Login RPC.
-	MBotServerServiceLoginProcedure = "/mbot.MBotServerService/Login"
 	// MBotServerServiceCreateCustomerProcedure is the fully-qualified name of the MBotServerService's
 	// CreateCustomer RPC.
 	MBotServerServiceCreateCustomerProcedure = "/mbot.MBotServerService/CreateCustomer"
@@ -68,12 +68,14 @@ const (
 	// MBotServerServiceGetSubscriptionByCustomerProcedure is the fully-qualified name of the
 	// MBotServerService's GetSubscriptionByCustomer RPC.
 	MBotServerServiceGetSubscriptionByCustomerProcedure = "/mbot.MBotServerService/GetSubscriptionByCustomer"
+	// MbotAuthServerServiceLoginProcedure is the fully-qualified name of the MbotAuthServerService's
+	// Login RPC.
+	MbotAuthServerServiceLoginProcedure = "/mbot.MbotAuthServerService/Login"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
 	mBotServerServiceServiceDescriptor                         = mbotpb.File_service_proto.Services().ByName("MBotServerService")
-	mBotServerServiceLoginMethodDescriptor                     = mBotServerServiceServiceDescriptor.Methods().ByName("Login")
 	mBotServerServiceCreateCustomerMethodDescriptor            = mBotServerServiceServiceDescriptor.Methods().ByName("CreateCustomer")
 	mBotServerServiceGetCustomerMethodDescriptor               = mBotServerServiceServiceDescriptor.Methods().ByName("GetCustomer")
 	mBotServerServiceGetCustomersAllMethodDescriptor           = mBotServerServiceServiceDescriptor.Methods().ByName("GetCustomersAll")
@@ -85,11 +87,12 @@ var (
 	mBotServerServiceUpdateSubscriptionMethodDescriptor        = mBotServerServiceServiceDescriptor.Methods().ByName("UpdateSubscription")
 	mBotServerServiceDeleteSubscriptionMethodDescriptor        = mBotServerServiceServiceDescriptor.Methods().ByName("DeleteSubscription")
 	mBotServerServiceGetSubscriptionByCustomerMethodDescriptor = mBotServerServiceServiceDescriptor.Methods().ByName("GetSubscriptionByCustomer")
+	mbotAuthServerServiceServiceDescriptor                     = mbotpb.File_service_proto.Services().ByName("MbotAuthServerService")
+	mbotAuthServerServiceLoginMethodDescriptor                 = mbotAuthServerServiceServiceDescriptor.Methods().ByName("Login")
 )
 
 // MBotServerServiceClient is a client for the mbot.MBotServerService service.
 type MBotServerServiceClient interface {
-	Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error)
 	CreateCustomer(context.Context, *connect.Request[mbotpb.CreateCustomerRequest]) (*connect.Response[mbotpb.CreateCustomerResponse], error)
 	GetCustomer(context.Context, *connect.Request[mbotpb.GetCustomerRequest]) (*connect.Response[mbotpb.GetCustomerResponse], error)
 	GetCustomersAll(context.Context, *connect.Request[mbotpb.GetCustomersAllRequest]) (*connect.Response[mbotpb.GetCustomersAllResponse], error)
@@ -113,12 +116,6 @@ type MBotServerServiceClient interface {
 func NewMBotServerServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) MBotServerServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &mBotServerServiceClient{
-		login: connect.NewClient[mbotpb.LoginRequest, mbotpb.LoginResponse](
-			httpClient,
-			baseURL+MBotServerServiceLoginProcedure,
-			connect.WithSchema(mBotServerServiceLoginMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 		createCustomer: connect.NewClient[mbotpb.CreateCustomerRequest, mbotpb.CreateCustomerResponse](
 			httpClient,
 			baseURL+MBotServerServiceCreateCustomerProcedure,
@@ -190,7 +187,6 @@ func NewMBotServerServiceClient(httpClient connect.HTTPClient, baseURL string, o
 
 // mBotServerServiceClient implements MBotServerServiceClient.
 type mBotServerServiceClient struct {
-	login                     *connect.Client[mbotpb.LoginRequest, mbotpb.LoginResponse]
 	createCustomer            *connect.Client[mbotpb.CreateCustomerRequest, mbotpb.CreateCustomerResponse]
 	getCustomer               *connect.Client[mbotpb.GetCustomerRequest, mbotpb.GetCustomerResponse]
 	getCustomersAll           *connect.Client[mbotpb.GetCustomersAllRequest, mbotpb.GetCustomersAllResponse]
@@ -202,11 +198,6 @@ type mBotServerServiceClient struct {
 	updateSubscription        *connect.Client[mbotpb.UpdateSubscriptionRequest, mbotpb.UpdateSubscriptionResponse]
 	deleteSubscription        *connect.Client[mbotpb.DeleteSubscriptionRequest, mbotpb.DeleteSubscriptionResponse]
 	getSubscriptionByCustomer *connect.Client[mbotpb.GetSubscriptionByCustomerRequest, mbotpb.GetSubscriptionByCustomerResponse]
-}
-
-// Login calls mbot.MBotServerService.Login.
-func (c *mBotServerServiceClient) Login(ctx context.Context, req *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error) {
-	return c.login.CallUnary(ctx, req)
 }
 
 // CreateCustomer calls mbot.MBotServerService.CreateCustomer.
@@ -266,7 +257,6 @@ func (c *mBotServerServiceClient) GetSubscriptionByCustomer(ctx context.Context,
 
 // MBotServerServiceHandler is an implementation of the mbot.MBotServerService service.
 type MBotServerServiceHandler interface {
-	Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error)
 	CreateCustomer(context.Context, *connect.Request[mbotpb.CreateCustomerRequest]) (*connect.Response[mbotpb.CreateCustomerResponse], error)
 	GetCustomer(context.Context, *connect.Request[mbotpb.GetCustomerRequest]) (*connect.Response[mbotpb.GetCustomerResponse], error)
 	GetCustomersAll(context.Context, *connect.Request[mbotpb.GetCustomersAllRequest]) (*connect.Response[mbotpb.GetCustomersAllResponse], error)
@@ -286,12 +276,6 @@ type MBotServerServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewMBotServerServiceHandler(svc MBotServerServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	mBotServerServiceLoginHandler := connect.NewUnaryHandler(
-		MBotServerServiceLoginProcedure,
-		svc.Login,
-		connect.WithSchema(mBotServerServiceLoginMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	mBotServerServiceCreateCustomerHandler := connect.NewUnaryHandler(
 		MBotServerServiceCreateCustomerProcedure,
 		svc.CreateCustomer,
@@ -360,8 +344,6 @@ func NewMBotServerServiceHandler(svc MBotServerServiceHandler, opts ...connect.H
 	)
 	return "/mbot.MBotServerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case MBotServerServiceLoginProcedure:
-			mBotServerServiceLoginHandler.ServeHTTP(w, r)
 		case MBotServerServiceCreateCustomerProcedure:
 			mBotServerServiceCreateCustomerHandler.ServeHTTP(w, r)
 		case MBotServerServiceGetCustomerProcedure:
@@ -392,10 +374,6 @@ func NewMBotServerServiceHandler(svc MBotServerServiceHandler, opts ...connect.H
 
 // UnimplementedMBotServerServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedMBotServerServiceHandler struct{}
-
-func (UnimplementedMBotServerServiceHandler) Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.Login is not implemented"))
-}
 
 func (UnimplementedMBotServerServiceHandler) CreateCustomer(context.Context, *connect.Request[mbotpb.CreateCustomerRequest]) (*connect.Response[mbotpb.CreateCustomerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.CreateCustomer is not implemented"))
@@ -439,4 +417,72 @@ func (UnimplementedMBotServerServiceHandler) DeleteSubscription(context.Context,
 
 func (UnimplementedMBotServerServiceHandler) GetSubscriptionByCustomer(context.Context, *connect.Request[mbotpb.GetSubscriptionByCustomerRequest]) (*connect.Response[mbotpb.GetSubscriptionByCustomerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MBotServerService.GetSubscriptionByCustomer is not implemented"))
+}
+
+// MbotAuthServerServiceClient is a client for the mbot.MbotAuthServerService service.
+type MbotAuthServerServiceClient interface {
+	Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error)
+}
+
+// NewMbotAuthServerServiceClient constructs a client for the mbot.MbotAuthServerService service. By
+// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
+// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// connect.WithGRPC() or connect.WithGRPCWeb() options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewMbotAuthServerServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) MbotAuthServerServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	return &mbotAuthServerServiceClient{
+		login: connect.NewClient[mbotpb.LoginRequest, mbotpb.LoginResponse](
+			httpClient,
+			baseURL+MbotAuthServerServiceLoginProcedure,
+			connect.WithSchema(mbotAuthServerServiceLoginMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// mbotAuthServerServiceClient implements MbotAuthServerServiceClient.
+type mbotAuthServerServiceClient struct {
+	login *connect.Client[mbotpb.LoginRequest, mbotpb.LoginResponse]
+}
+
+// Login calls mbot.MbotAuthServerService.Login.
+func (c *mbotAuthServerServiceClient) Login(ctx context.Context, req *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error) {
+	return c.login.CallUnary(ctx, req)
+}
+
+// MbotAuthServerServiceHandler is an implementation of the mbot.MbotAuthServerService service.
+type MbotAuthServerServiceHandler interface {
+	Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error)
+}
+
+// NewMbotAuthServerServiceHandler builds an HTTP handler from the service implementation. It
+// returns the path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewMbotAuthServerServiceHandler(svc MbotAuthServerServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	mbotAuthServerServiceLoginHandler := connect.NewUnaryHandler(
+		MbotAuthServerServiceLoginProcedure,
+		svc.Login,
+		connect.WithSchema(mbotAuthServerServiceLoginMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/mbot.MbotAuthServerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case MbotAuthServerServiceLoginProcedure:
+			mbotAuthServerServiceLoginHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedMbotAuthServerServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedMbotAuthServerServiceHandler struct{}
+
+func (UnimplementedMbotAuthServerServiceHandler) Login(context.Context, *connect.Request[mbotpb.LoginRequest]) (*connect.Response[mbotpb.LoginResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("mbot.MbotAuthServerService.Login is not implemented"))
 }
