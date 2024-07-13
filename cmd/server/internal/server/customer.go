@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/rkuprov/mbot/pkg/errs"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 	"github.com/rkuprov/mbot/pkg/store"
 )
@@ -22,13 +23,13 @@ func (m *MBot) CreateCustomer(ctx context.Context,
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint \"customers_email_key\"") {
-			return nil, fmt.Errorf("customer with email %s already exists", req.Msg.GetEmail())
+			return nil, errs.HandleServerError(connect.CodeAlreadyExists, fmt.Errorf("customer with email %s already exists", req.Msg.GetEmail()))
 		}
-		return nil, err
+		return nil, errs.HandleServerError(connect.CodeInternal, err)
 	}
 	c, err := m.db.GetCustomer(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errs.HandleServerError(connect.CodeInternal, err)
 	}
 	return &connect.Response[mbotpb.CreateCustomerResponse]{
 		Msg: &mbotpb.CreateCustomerResponse{
@@ -43,7 +44,7 @@ func (m *MBot) GetCustomersAll(ctx context.Context,
 	req *connect.Request[mbotpb.GetCustomersAllRequest]) (*connect.Response[mbotpb.GetCustomersAllResponse], error) {
 	customers, err := m.db.GetCustomersAll(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errs.HandleServerError(connect.CodeInternal, err)
 	}
 	out := make([]*mbotpb.Customer, 0)
 	for _, c := range customers {
@@ -59,18 +60,23 @@ func (m *MBot) GetCustomersAll(ctx context.Context,
 
 func (m *MBot) GetCustomer(ctx context.Context,
 	req *connect.Request[mbotpb.GetCustomerRequest]) (*connect.Response[mbotpb.GetCustomerResponse], error) {
-	cust, err := m.db.GetCustomer(ctx, req.Msg.GetCustomerId())
+	cst, err := m.db.GetCustomer(ctx, req.Msg.GetCustomerId())
 	if err != nil {
-		return nil, err
+		return nil, errs.HandleServerError(connect.CodeInternal, err)
+	}
+	if cst == nil {
+		return nil, errs.HandleServerError(
+			connect.CodeNotFound,
+			fmt.Errorf("customer with ID %s not found", req.Msg.GetCustomerId()))
 	}
 	return &connect.Response[mbotpb.GetCustomerResponse]{
 		Msg: &mbotpb.GetCustomerResponse{
 			Customer: &mbotpb.Customer{
-				Id:              cust.Id,
-				Name:            cust.Name,
-				Email:           cust.Email,
-				Contact:         cust.Contact,
-				SubscriptionIds: cust.SubscriptionIds,
+				Id:              cst.Id,
+				Name:            cst.Name,
+				Email:           cst.Email,
+				Contact:         cst.Contact,
+				SubscriptionIds: cst.SubscriptionIds,
 			},
 		},
 	}, nil
@@ -86,16 +92,16 @@ func (m *MBot) UpdateCustomer(ctx context.Context,
 		},
 	)
 	if err != nil {
-		return nil, err
+		return nil, errs.HandleServerError(connect.CodeInternal, err)
 	}
 	out, err := m.db.GetCustomer(ctx, req.Msg.GetId())
 	if err != nil {
-		return nil, err
+		return nil, errs.HandleServerError(connect.CodeInternal, err)
 	}
 	return &connect.Response[mbotpb.UpdateCustomerResponse]{
 		Msg: &mbotpb.UpdateCustomerResponse{
 			Message:  fmt.Sprintf("Customer updated successfully"),
-			Customer: &out,
+			Customer: out,
 		},
 	}, nil
 
