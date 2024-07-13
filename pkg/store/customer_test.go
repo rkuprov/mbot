@@ -79,8 +79,9 @@ func TestStore_DeleteCustomer(t *testing.T) {
 	err = client.DeleteCustomer(context.Background(), id)
 	require.NoError(t, err)
 
-	_, err = client.GetCustomer(context.Background(), id)
-	assert.Error(t, err)
+	out, err := client.GetCustomer(context.Background(), id)
+	assert.Nil(t, out)
+	assert.Nil(t, err)
 	_, err = client.GetSubscription(context.Background(), sid)
 	assert.Error(t, err)
 }
