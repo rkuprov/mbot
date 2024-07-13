@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,7 +17,6 @@ func TestAuth_ConfirmAndRotateToken(t *testing.T) {
 	require.NoError(t, err)
 
 	token, err := auth.Login(ctx, "testuser", "test")
-	fmt.Println(token)
 	require.NoError(t, err)
 	token2, err := auth.ConfirmAndRotateToken(ctx, token)
 	assert.NoError(t, err)
