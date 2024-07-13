@@ -3,9 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
-	"time"
 
 	"connectrpc.com/connect"
 
@@ -57,7 +55,6 @@ func WithTokenInterceptor(a *auth.Auth) connect.UnaryInterceptorFunc {
 				return resp, errs.HandleServerError(connect.CodeInternal, err, errs.WithSessionTokenDetail(newToken.Value))
 			}
 
-			fmt.Printf("new token: %s @ %s\n", newToken.Value, time.Now().String())
 			resp.Header().Set(auth.HeaderSessionToken, newToken.Value)
 
 			return resp, nil
