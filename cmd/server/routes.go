@@ -12,6 +12,7 @@ import (
 	"github.com/rkuprov/mbot/cmd/server/internal/server"
 	"github.com/rkuprov/mbot/pkg/auth"
 	"github.com/rkuprov/mbot/pkg/cfg"
+	"github.com/rkuprov/mbot/pkg/errs"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 	"github.com/rkuprov/mbot/pkg/handlers"
 	"github.com/rkuprov/mbot/pkg/store"
@@ -53,8 +54,9 @@ func WithTokenInterceptor(a *auth.Auth) connect.UnaryInterceptorFunc {
 			}
 			resp, err := next(ctx, req)
 			if err != nil {
-				return nil, err
+				return resp, errs.HandleServerError(connect.CodeInternal, err, errs.WithSessionTokenDetail(newToken.Value))
 			}
+
 			fmt.Printf("new token: %s @ %s\n", newToken.Value, time.Now().String())
 			resp.Header().Set(auth.HeaderSessionToken, newToken.Value)
 

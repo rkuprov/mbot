@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -86,4 +88,19 @@ func newSessionToken() *mbotpb.SessionToken {
 	return &mbotpb.SessionToken{
 		Value: uuid.New().String(),
 	}
+}
+
+func UpdateSessionToken(token string) error {
+	f, err := os.OpenFile(SessionFile, os.O_RDWR, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to open file: %w", err)
+	}
+	defer f.Close()
+
+	_, err = fmt.Fprintf(f, "%s", token)
+	if err != nil {
+		return fmt.Errorf("failed to write to file: %w", err)
+	}
+
+	return nil
 }

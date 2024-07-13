@@ -2,13 +2,13 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 
 	"connectrpc.com/connect"
 
 	"github.com/rkuprov/mbot/pkg/auth"
+	"github.com/rkuprov/mbot/pkg/errs"
 )
 
 func WithTokenInterceptor() connect.UnaryInterceptorFunc {
@@ -21,10 +21,10 @@ func WithTokenInterceptor() connect.UnaryInterceptorFunc {
 
 			resp, err := next(ctx, req)
 			if err != nil {
-				return nil, err
+				return nil, errs.HandleClientError(err)
 			}
 
-			err = updateSessionToken(
+			err = auth.UpdateSessionToken(
 				resp.Header().Get(auth.HeaderSessionToken),
 			)
 			if err != nil {
@@ -50,19 +50,4 @@ func insertSessionToken(req connect.AnyRequest) (connect.AnyRequest, error) {
 	req.Header().Set(auth.HeaderSessionToken, string(bts))
 
 	return req, nil
-}
-
-func updateSessionToken(token string) error {
-	f, err := os.OpenFile(auth.SessionFile, os.O_RDWR, 0644)
-	if err != nil {
-		return fmt.Errorf("failed to open file: %w", err)
-	}
-	defer f.Close()
-
-	_, err = fmt.Fprintf(f, "%s", token)
-	if err != nil {
-		return fmt.Errorf("failed to write to file: %w", err)
-	}
-
-	return nil
 }

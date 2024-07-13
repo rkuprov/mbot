@@ -2,7 +2,9 @@ package store
 
 import (
 	"context"
+	"errors"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
@@ -35,7 +37,7 @@ func (s *Store) CreateCustomer(ctx context.Context, in CustomerCreate) (string, 
 	return id, nil
 }
 
-func (s *Store) GetCustomer(ctx context.Context, id string) (mbotpb.Customer, error) {
+func (s *Store) GetCustomer(ctx context.Context, id string) (*mbotpb.Customer, error) {
 	var c mbotpb.Customer
 	var subs pgtype.Array[*string]
 	err := s.pg.QueryRow(ctx, `
@@ -53,13 +55,22 @@ where customers.id = $1 and customers.is_active = true
 		&c.Contact,
 	)
 	if err != nil {
-		return mbotpb.Customer{}, err
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
 	}
 	err = s.pg.QueryRow(ctx, `
 		SELECT ARRAY_AGG(subscriptions.id) as subscription_ids
 		FROM subscriptions
 		WHERE subscriptions.customer_id = $1 and subscriptions.is_active = true
 	`, id).Scan(&subs)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return &c, nil
+		}
+		return nil, err
+	}
 
 	for _, sub := range subs.Elements {
 		if sub == nil {
@@ -68,7 +79,7 @@ where customers.id = $1 and customers.is_active = true
 		c.SubscriptionIds = append(c.SubscriptionIds, *sub)
 	}
 
-	return c, nil
+	return &c, nil
 }
 
 func (s *Store) GetCustomersAll(ctx context.Context) ([]mbotpb.Customer, error) {
