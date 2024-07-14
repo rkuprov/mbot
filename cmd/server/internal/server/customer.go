@@ -9,6 +9,7 @@ import (
 
 	"github.com/rkuprov/mbot/pkg/errs"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
+	"github.com/rkuprov/mbot/pkg/l"
 	"github.com/rkuprov/mbot/pkg/store"
 )
 
@@ -31,6 +32,9 @@ func (m *MBot) CreateCustomer(ctx context.Context,
 	if err != nil {
 		return nil, errs.HandleServerError(connect.CodeInternal, err)
 	}
+
+	l.Log(fmt.Sprintf("Customer %s created", c.GetName()))
+
 	return &connect.Response[mbotpb.CreateCustomerResponse]{
 		Msg: &mbotpb.CreateCustomerResponse{
 			Message:         fmt.Sprintf("Customer created with ID: %s", id),
@@ -98,13 +102,15 @@ func (m *MBot) UpdateCustomer(ctx context.Context,
 	if err != nil {
 		return nil, errs.HandleServerError(connect.CodeInternal, err)
 	}
+
+	l.Log(fmt.Sprintf("Customer %s updated", out.GetName()))
+
 	return &connect.Response[mbotpb.UpdateCustomerResponse]{
 		Msg: &mbotpb.UpdateCustomerResponse{
 			Message:  fmt.Sprintf("Customer updated successfully"),
 			Customer: out,
 		},
 	}, nil
-
 }
 
 func (m *MBot) DeleteCustomer(ctx context.Context,

@@ -2,10 +2,12 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"connectrpc.com/connect"
 
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
+	"github.com/rkuprov/mbot/pkg/l"
 	"github.com/rkuprov/mbot/pkg/store"
 )
 
@@ -23,6 +25,9 @@ func (m *MBot) CreateSubscription(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
+
+	l.Log(fmt.Sprintf("Subscription %s created for user %s", sub.SubscriptionId, req.Msg.GetCustomerId()))
+
 	return &connect.Response[mbotpb.CreateSubscriptionResponse]{
 		Msg: &mbotpb.CreateSubscriptionResponse{
 			Message:      "subscription created successfully",
@@ -89,6 +94,9 @@ func (m *MBot) UpdateSubscription(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
+
+	l.Log(fmt.Sprintf("Subscription %s updated", req.Msg.GetId()))
+
 	return &connect.Response[mbotpb.UpdateSubscriptionResponse]{Msg: resp}, nil
 }
 
@@ -98,6 +106,9 @@ func (m *MBot) DeleteSubscription(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
+
+	l.Log(fmt.Sprintf("Subscription %s deleted", req.Msg.GetSubscriptionId()))
+
 	return &connect.Response[mbotpb.DeleteSubscriptionResponse]{
 		Msg: &mbotpb.DeleteSubscriptionResponse{
 			Deleted: true,

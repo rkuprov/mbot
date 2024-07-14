@@ -2,11 +2,13 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"connectrpc.com/connect"
 
 	"github.com/rkuprov/mbot/pkg/auth"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
+	"github.com/rkuprov/mbot/pkg/l"
 )
 
 func (m *MBot) Login(ctx context.Context, req *connect.Request[mbotpb.LoginRequest]) (
@@ -25,6 +27,8 @@ func (m *MBot) Login(ctx context.Context, req *connect.Request[mbotpb.LoginReque
 	}
 	resp.Header().Set(auth.HeaderSessionToken, token)
 
+	l.Log(fmt.Sprintf("User %s logged in", req.Msg.GetUsername()))
+
 	return &resp, nil
 }
 
@@ -38,6 +42,8 @@ func (m *MBot) Logout(ctx context.Context, req *connect.Request[mbotpb.LogoutReq
 	if err != nil {
 		return nil, err
 	}
+
+	l.Log(fmt.Sprint("User logged out"))
 
 	return &connect.Response[mbotpb.LogoutResponse]{}, nil
 }
@@ -56,6 +62,8 @@ func (m *MBot) Register(ctx context.Context, req *connect.Request[mbotpb.Registe
 			Ok: true,
 		},
 	}
+
+	l.Log(fmt.Sprintf("User %s registered", req.Msg.GetUsername()))
 
 	return &resp, nil
 }
