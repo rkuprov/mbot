@@ -13,6 +13,7 @@ import (
 	"github.com/rkuprov/mbot/pkg/errs"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 	"github.com/rkuprov/mbot/pkg/handlers"
+	"github.com/rkuprov/mbot/pkg/l"
 	"github.com/rkuprov/mbot/pkg/store"
 )
 
@@ -37,6 +38,7 @@ func SetupRoutes(mux *http.ServeMux, configs *cfg.Cfg) {
 
 	mux.Handle("GET /status", handlers.Status(ctx))
 	mux.Handle("POST /subscription/{token}", handlers.Confirm(ctx, db))
+	l.Log("routes setup")
 }
 
 func WithTokenInterceptor(a *auth.Auth) connect.UnaryInterceptorFunc {
