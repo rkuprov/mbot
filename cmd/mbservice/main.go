@@ -21,7 +21,7 @@ func main() {
 
 	SetupRoutes(mux, configs)
 
-	l.Log("server started")
+	l.Log("mbservice started")
 	err = http.ListenAndServe("localhost:8080", mux)
 	if err != nil {
 		panic(err)

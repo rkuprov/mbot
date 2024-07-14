@@ -6,7 +6,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/jedib0t/go-pretty/v6/table"
 
-	"github.com/rkuprov/mbot/cmd/cli/internal/ui"
+	"github.com/rkuprov/mbot/cmd/mbot/internal/ui"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 )

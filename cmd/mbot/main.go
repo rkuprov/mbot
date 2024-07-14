@@ -7,12 +7,12 @@ import (
 	"connectrpc.com/connect"
 	"github.com/alecthomas/kong"
 
-	"github.com/rkuprov/mbot/cmd/cli/internal/commands/add"
-	"github.com/rkuprov/mbot/cmd/cli/internal/commands/auth"
-	"github.com/rkuprov/mbot/cmd/cli/internal/commands/delete"
-	"github.com/rkuprov/mbot/cmd/cli/internal/commands/update"
-	"github.com/rkuprov/mbot/cmd/cli/internal/commands/view"
-	"github.com/rkuprov/mbot/cmd/cli/internal/middleware"
+	"github.com/rkuprov/mbot/cmd/mbot/internal/commands/add"
+	"github.com/rkuprov/mbot/cmd/mbot/internal/commands/auth"
+	"github.com/rkuprov/mbot/cmd/mbot/internal/commands/delete"
+	"github.com/rkuprov/mbot/cmd/mbot/internal/commands/update"
+	"github.com/rkuprov/mbot/cmd/mbot/internal/commands/view"
+	"github.com/rkuprov/mbot/cmd/mbot/internal/middleware"
 	"github.com/rkuprov/mbot/pkg/gen/mbotpb/mbotpbconnect"
 )
 
