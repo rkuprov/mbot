@@ -7,7 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/rkuprov/mbot/cmd/server/internal/server"
+	"github.com/rkuprov/mbot/cmd/mbservice/internal/server"
 	"github.com/rkuprov/mbot/pkg/auth"
 	"github.com/rkuprov/mbot/pkg/cfg"
 	"github.com/rkuprov/mbot/pkg/errs"
@@ -46,7 +46,7 @@ func WithTokenInterceptor(a *auth.Auth) connect.UnaryInterceptorFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
 			token := req.Header().Get(auth.HeaderSessionToken)
 			if token == "" {
-				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("server no token provided"))
+				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("mbservice no token provided"))
 			}
 			newToken, err := a.ConfirmAndRotateToken(ctx, token)
 			if err != nil {
