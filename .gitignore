@@ -4,3 +4,4 @@ deployment/*.json
 *.json
 *.session
 *.log
+*.xlsm
