@@ -31,12 +31,14 @@ func main() {
 	ctx := context.Background()
 	client := mbotpbconnect.NewMBotServerServiceClient(
 		http.DefaultClient,
-		"http://localhost:8080",
+		"http://136.36.82.165:7777",
 		connect.WithInterceptors(middleware.WithTokenInterceptor()),
+		connect.WithGRPC(),
 	)
 	authClient := mbotpbconnect.NewMbotAuthServerServiceClient(
 		http.DefaultClient,
-		"http://localhost:8080",
+		"http://136.36.82.165:7777",
+		connect.WithGRPC(),
 	)
 
 	cli := kong.Parse(&Options{},

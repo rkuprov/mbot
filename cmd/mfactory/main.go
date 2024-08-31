@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
-	"embed"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,9 +15,6 @@ import (
 
 	"github.com/rkuprov/mbot/pkg/cfg"
 )
-
-//go:embed panel_calculator.xlsm
-var fs embed.FS
 
 func main() {
 	now := time.Now()
@@ -82,7 +78,7 @@ func main() {
 }
 
 func createFile(_ context.Context) (string, error) {
-	bytes, err := fs.ReadFile("panel_calculator.xlsm")
+	bytes, err := os.ReadFile("data.mbot")
 	if err != nil {
 		return "", err
 	}
