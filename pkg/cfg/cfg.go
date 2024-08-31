@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"runtime"
 )
 
 type Cfg struct {
@@ -64,4 +66,36 @@ func getCFGFromPath(path string) (*Cfg, error) {
 		return nil, err
 	}
 	return cfg, nil
+}
+
+const (
+	mac     = "darwin"
+	linux   = "linux"
+	windows = "windows"
+)
+
+func InstallPath() string {
+	switch runtime.GOOS {
+	case mac:
+		return filepath.Join(os.Getenv("HOME"), "Library", "Application Support", "mBot")
+	case linux:
+	case windows:
+		return filepath.Join("C:", "Program Files", "mBot")
+	default:
+		return ""
+	}
+	return ""
+}
+
+func BinaryPath() string {
+	switch runtime.GOOS {
+	case mac:
+		return filepath.Join("System", "Applications")
+	case linux:
+	case windows:
+		return filepath.Join(InstallPath())
+	default:
+		return ""
+	}
+	return ""
 }
