@@ -9,6 +9,8 @@ import (
 	"runtime"
 )
 
+var subscriptionToken string
+
 type Cfg struct {
 	Postgres Postgres `json:"postgres"`
 }
@@ -98,4 +100,32 @@ func BinaryPath() string {
 		return ""
 	}
 	return ""
+}
+
+func BinaryName() string {
+	switch runtime.GOOS {
+	case mac:
+		return "mBot.app"
+	case linux:
+	case windows:
+		return "mBot.exe"
+	default:
+		return ""
+	}
+	return ""
+}
+
+func UpdateURL() string {
+	switch os.Getenv("MBOT_ENV") {
+	case "local":
+		return "http://localhost:8080"
+	case "testing":
+		return "http://localhost:8080"
+	default:
+		return ""
+	}
+}
+
+func SubscriptionToken() string {
+	return subscriptionToken
 }
