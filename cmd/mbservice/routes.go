@@ -38,6 +38,8 @@ func SetupRoutes(mux *http.ServeMux, configs *cfg.Cfg) {
 
 	mux.Handle("GET /status", handlers.Status(ctx))
 	mux.Handle("POST /subscription/{token}", handlers.Confirm(ctx, db))
+	mux.Handle("GET /subscription/{token}/version", handlers.Version(ctx))
+	mux.Handle("GET /subscription/{token}/update", handlers.Update(ctx, db))
 	l.Log("routes setup")
 }
 

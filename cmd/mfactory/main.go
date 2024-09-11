@@ -123,7 +123,7 @@ func checkSubscription(ctx context.Context) error {
 
 func checkUpdates(ctx context.Context) error {
 	client := &http.Client{}
-	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/version", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/update", nil)
 	if err != nil {
 		return err
 	}
