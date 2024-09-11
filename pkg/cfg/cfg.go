@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"runtime"
 )
+
+var subscriptionToken string
 
 type Cfg struct {
 	Postgres Postgres `json:"postgres"`
@@ -64,4 +68,64 @@ func getCFGFromPath(path string) (*Cfg, error) {
 		return nil, err
 	}
 	return cfg, nil
+}
+
+const (
+	mac     = "darwin"
+	linux   = "linux"
+	windows = "windows"
+)
+
+func InstallPath() string {
+	switch runtime.GOOS {
+	case mac:
+		return filepath.Join(os.Getenv("HOME"), "Library", "Application Support", "mBot")
+	case linux:
+	case windows:
+		return filepath.Join("C:", "Program Files", "mBot")
+	default:
+		return ""
+	}
+	return ""
+}
+
+func BinaryPath() string {
+	switch runtime.GOOS {
+	case mac:
+		return filepath.Join("System", "Applications")
+	case linux:
+	case windows:
+		return filepath.Join(InstallPath())
+	default:
+		return ""
+	}
+	return ""
+}
+
+func BinaryName() string {
+	switch runtime.GOOS {
+	case mac:
+		return "mBot.app"
+	case linux:
+	case windows:
+		return "mBot.exe"
+	default:
+		return ""
+	}
+	return ""
+}
+
+func UpdateURL() string {
+	switch os.Getenv("MBOT_ENV") {
+	case "local":
+		return "http://localhost:8080"
+	case "testing":
+		return "http://localhost:8080"
+	default:
+		return ""
+	}
+}
+
+func SubscriptionToken() string {
+	return subscriptionToken
 }

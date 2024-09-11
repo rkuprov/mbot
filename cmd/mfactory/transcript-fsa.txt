@@ -1,0 +1,43 @@
+﻿TriNet (3/18/2023, 8:03:26 AM): Hi. I’m TriNet's digital assistant. 
+TriNet (3/18/2023, 8:03:28 AM): What's the reason for your chat today? 
+TriNet (3/18/2023, 8:03:29 AM): Menu Options:
+	Ask about an open case
+	New question or request 
+Roman (3/18/2023, 8:03:32 AM): New question or request 
+TriNet (3/18/2023, 8:03:34 AM): What's the subject of your question or request? 
+TriNet (3/18/2023, 8:03:35 AM): Menu Options:
+	Benefits
+	Payroll/Paycheck
+	Form W-2
+	Other 
+Roman (3/18/2023, 8:03:38 AM): Benefits 
+TriNet (3/18/2023, 8:03:40 AM): Thank you for your choice, please choose among the below choices 
+TriNet (3/18/2023, 8:03:41 AM): Menu Options:
+	COBRA
+	FSA (Flexible Spending Account)
+	Coverage & Enrollment 
+Roman (3/18/2023, 8:03:43 AM): FSA (Flexible Spending Account) 
+TriNet (3/18/2023, 8:03:45 AM): Thank you. I’ll connect you to a representative to help with your FSA (Flexible Spending Account) question. 
+Saranya (3/18/2023, 8:03:48 AM): Hi Roman. Thank you for contacting TriNet. My name is Saranya. How may I assist you today? 
+Roman (3/18/2023, 8:03:55 AM): Hi, Saranya! 
+Saranya (3/18/2023, 8:04:29 AM): Hello. 
+Roman (3/18/2023, 8:04:35 AM): I'm wondering how I can reimburse my bank account for the eligible childcare expenses with my FSA account. 
+Saranya (3/18/2023, 8:04:54 AM): I would be happy to assist you with that today. 
+Saranya (3/18/2023, 8:05:13 AM): To submit a claim for reimbursement from your Flexible Spending Account, you can go to Benefits > Flexible Spending Accounts > Submit Claim. 
+Roman (3/18/2023, 8:05:15 AM): Our daycare charges way more per month than the contribution we make. So, I figured I could just withdraw the money i put in from time to time 
+Saranya (3/18/2023, 8:05:49 AM): You would not be able to withdraw the money. 
+Saranya (3/18/2023, 8:06:13 AM): The claims would be submitted manually and then reimbursement would be provided to you from your Dependent Care account. 
+Roman (3/18/2023, 8:06:59 AM): But where would that money be reimbursed to? Would they be added to my paycheck or directed to my bank account? 
+Saranya (3/18/2023, 8:07:17 AM): It would be either Direct Deposit to the account associated with your payroll or via a paper check. If you allow me a moment I can confirm you preference. 
+Roman (3/18/2023, 8:07:27 AM): I was about to submit a claim, but it never asked me for my bank account 
+Roman (3/18/2023, 8:07:37 AM): Thank you 
+Saranya (3/18/2023, 8:08:04 AM): You are set up for reimbursement via Direct Deposit. 
+Roman (3/18/2023, 8:08:13 AM): Awesome. Last question 
+Roman (3/18/2023, 8:08:59 AM): Can I do partial reimbursement or do they need to be exact? Like, my dependent care balance is $833 right now, but I already paid about $2500 in daycare costs to date 
+Roman (3/18/2023, 8:09:07 AM): (this year) 
+Saranya (3/18/2023, 8:09:19 AM): Yes, you can do partial claims for what you have available. 
+Saranya (3/18/2023, 8:09:51 AM): Is there anything else I can help you with? Additionally, for your convenience, you may access the chat transcript by clicking on Save Chat or Save Conversation prior to exiting the chat. 
+Roman (3/18/2023, 8:10:08 AM): Oh, great! So, I can just put in the bill that has a higher amount and withdraw what I have? 
+Saranya (3/18/2023, 8:10:15 AM): That is correct. 
+Saranya (3/18/2023, 8:10:32 AM): You would only be reimbursed what is available. 
+Roman (3/18/2023, 8:10:46 AM): awesome! Thank you so much Saranya! 
